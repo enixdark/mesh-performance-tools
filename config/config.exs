@@ -27,3 +27,8 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+config :logger, level: :info
+
+config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONECTION") || 50 
+config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 2_000
+config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 1_00_000

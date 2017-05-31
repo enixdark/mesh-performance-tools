@@ -15,7 +15,7 @@ defmodule MeshbluPerformanceTools.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger,:httpotion, :poison]]
+    [extra_applications: [:logger,:httpotion, :poison, :ibrowse, :poolboy]]
   end
 
   # Dependencies can be Hex packages:
@@ -31,6 +31,9 @@ defmodule MeshbluPerformanceTools.Mixfile do
     [
       {:httpotion, "~> 3.0.2"},
       {:poison, "~> 3.0"},
+      {:poolboy, "~> 1.5.1"},
+      {:ibrowse, "~> 4.4.0"},
+      {:hackney, "~> 1.8"}
     ]
   end
 end
