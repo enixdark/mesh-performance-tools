@@ -1,45 +1,49 @@
-defmodule MeshbluPerformanceTools.Tools.Register do
+defmodule MeshbluPerformanceTools.Register do
   use GenServer
   require Logger
   require IEx
 
-  def start_link() do
-    Logger.info "start request...................."
-    GenServer.start_link(__MODULE__, [], [])
+  def start_link(args) do
+    Logger.info "start register...................."
+    GenServer.start_link(__MODULE__, args, [])
   end
 
-  def init(_) do
+  def init(args) do
     {:ok, {%{}, []}}
   end
   
-  def handle_cast({:register, uri, body}, state) do
-    # p = get(elem(state, 0))
-    # MeshbluPerformanceTools.Tools.Process.subscribe(p, "", "")
-    # {:noreply, state}
-    case HTTPotion.post uri, 
-       [body: body |> Poison.encode!,
-       headers: ["Content-Type": "application/json"]] do
-      %HTTPotion.Response{body: content} ->
-        IO.puts content
-        p = get(elem(state, 0))
-        res = content |> Poison.decode!
-        MeshbluPerformanceTools.Tools.Process.subscribe(p, res["uuid"], res["token"])
-        {:noreply, { elem(state,0), elem(state,1) ++ [content]}}
-      _ ->
-        {:noreply, state}
-    end
+  def handle_cast({:register, uri}, state) do
+    p = get(elem(state, 0))
+    MeshbluPerformanceTools.Process.subscribe(p, "", "")
+    {:noreply, state}
+    # case HTTPotion.post uri, 
+    #    [body: body |> Poison.encode!,
+    #    headers: ["Content-Type": "application/json"]] do
+    #   %HTTPotion.Response{body: content} ->
+    #     IO.puts content
+    #     p = get(elem(state, 0))
+    #     res = content |> Poison.decode!
+    #     MeshbluPerformanceTools.Tools.Process.subscribe(p, res["uuid"], res["token"])
+    #     {:noreply, { elem(state,0), elem(state,1) ++ [content]}}
+    #   _ ->
+    #     {:noreply, state}
+    # end
     
   end
 
-  def register(pid, uri \\ MeshbluPerformanceTools.Tools.Const.device_uri, 
-               body \\ MeshbluPerformanceTools.Tools.Const.version_2) do
-    GenServer.cast(pid, {:register, uri, body})
+  def register(pid, uri \\ Application.get_env(:meshblu_performance_tools, :uri)) do
+    GenServer.cast(pid, {:register, uri})
   end
 
   defp get(state) do
     p = Map.get(state,:pid, nil)
     if p == nil do
-      {:ok, p } = MeshbluPerformanceTools.Tools.Process.start_link()
+      %URI{scheme: protocol, host: stream_host, port: stream_port} = URI.parse(Application.get_env(:meshblu_performance_tools, :stream_uri))
+      {:ok, p } = MeshbluPerformanceTools.Process.start_link(%{
+        protocol: protocol,
+        host: stream_host,
+        port: stream_port
+      })
       Map.put(state,:pid, p)
     end
     p

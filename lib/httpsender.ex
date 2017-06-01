@@ -22,7 +22,7 @@ defmodule HTTPSender do
       {:error, :connection_closed_no_retry} ->
         :error
       {:ibrowse_async_response, ^id, data} ->
-        IO.puts data
+        IO.inspect data
         async_loop(id)
       {:ibrowse_async_response_end, ^id} ->
         :end

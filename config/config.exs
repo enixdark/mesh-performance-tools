@@ -29,6 +29,23 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 config :logger, level: :info
 
-config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONECTION") || 50 
-config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 2_000
-config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 1_00_000
+# config :logger,
+#   backends: [{LoggerFileBackend, :info},
+#              {LoggerFileBackend, :error}]
+
+# config :logger, :info,
+#   path: "logs/info.log",
+#   level: :info
+
+# config :logger, :error,
+#   path: "logs/error.log",
+#   level: :error
+
+config :meshblu_performance_tools, :uri, System.get_env("URI") || "http://localhost:3000"
+config :meshblu_performance_tools, :stream_uri, System.get_env("STREAM_URI") || "http://localhost:3001"
+config :meshblu_performance_tools, :concurrency, System.get_env("CONCURRENCY") || 1000
+config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONNECTION") || 1000
+config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 1_000
+config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 1000_000
+
+
