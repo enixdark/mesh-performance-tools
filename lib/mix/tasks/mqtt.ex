@@ -2,34 +2,11 @@ require IEx;
 
 defmodule Mix.Tasks.Mqtt do
   use Mix.Task
+  use Mix.Tasks.Base
   require Logger
 
   @shortdoc "return mqtt"
-  defp parse_args(args) do
-    parse = args 
-    |> OptionParser.parse(
-      switches: [logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, uri: :string, stream_uri: :string],
-      aliases: [l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri],
-    )
-    case parse do
-      {[], _, _} -> process(:help)
-      {opts, _, _} -> process(Keyword.merge([concurrency: Application.get_env(:meshblu_performance_tools, :concurrency), 
-                                             max_connection: Application.get_env(:meshblu_performance_tools, :max_connection), 
-                                             delay: Application.get_env(:meshblu_performance_tools, :delay), 
-                                             uri: Application.get_env(:meshblu_performance_tools, :uri),
-                                             stream_uri: Application.get_env(:meshblu_performance_tools, :stream_uri)], 
-                                             opts) |> Enum.sort)
-      
-    end
-  end
-
-  defp loop() do
-    receive do
-      _ -> loop()
-    end
-  end
-
-
+  
   defp process(:help) do
     IO.puts """
       Cli tool to test performance for meshblu mqtt
@@ -48,27 +25,20 @@ defmodule Mix.Tasks.Mqtt do
 
   defp process(opts) do
     case opts do
-      [concurrency: _, delay: _, max_connection: _, stream_uri: _, uri: _] -> 
+      [concurrency: concurrency, delay: delay, max_connection: max_connection, uri: uri] -> 
         Logger.info "Start services..................."
-        for _ <- 0..1 do
-          for _ <- 0..2 do 
+        turn = max_connection / concurrency - 1
+        for _ <- 0..round(turn) do
+          for _ <- 0..round(concurrency) do 
             {:ok, pid} =  MeshbluPerformanceTools.MQTT.Client.start_link
             MeshbluPerformanceTools.MQTT.Client.subscriber(pid)
           end
-          :timer.sleep(2000)
+          :timer.sleep(delay)
         end
        _ ->
          :ok
     end
     loop()
-  end
-
-  def run(args) do
-    Process.flag(:trap_exit, true)    
-    Mix.Task.run "app.start", []
-    args 
-    |> parse_args 
-    |> process
   end
 
 end
