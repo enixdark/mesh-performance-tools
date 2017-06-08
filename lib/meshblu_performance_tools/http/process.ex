@@ -12,7 +12,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     {:ok, %{protocal: args[:protocal], host: args[:host], port: args[:port]}}
   end
 
-  def subscribe(pid, uuid, token) do
+  def subscriber(pid, uuid, token) do
     GenServer.cast(pid, {:subscribe, uuid, token})
   end
 

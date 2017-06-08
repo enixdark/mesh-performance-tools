@@ -12,15 +12,14 @@ defmodule MeshbluPerformanceTools.HTTP.Register do
     {:ok, {%{}, []}}
   end
   
-  def handle_cast({:register, uri}, state) do
-    p = get(elem(state, 0))
-    MeshbluPerformanceTools.HTTP.Process.subscribe(p, "", "")
+  def handle_cast({:subscriber, uri}, state) do
+    p = get(elem(state, 0), uri)
+    MeshbluPerformanceTools.HTTP.Process.subscriber(p, "", "")
     {:noreply, state}
     # case HTTPotion.post uri, 
     #    [body: body |> Poison.encode!,
     #    headers: ["Content-Type": "application/json"]] do
     #   %HTTPotion.Response{body: content} ->
-    #     IO.puts content
     #     p = get(elem(state, 0))
     #     res = content |> Poison.decode!
     #     MeshbluPerformanceTools.Tools.Process.subscribe(p, res["uuid"], res["token"])
@@ -31,15 +30,15 @@ defmodule MeshbluPerformanceTools.HTTP.Register do
     
   end
 
-  def register(pid, uri \\ Application.get_env(:meshblu_performance_tools, :uri)) do
-    GenServer.cast(pid, {:register, uri})
+  def subscriber(pid, uri) do
+    GenServer.cast(pid, {:subscriber, uri})
   end
 
-  defp get(state) do
+  defp get(state, uri) do
     p = Map.get(state,:pid, nil)
     if p == nil do
-      %URI{scheme: protocol, host: stream_host, port: stream_port} = URI.parse(Application.get_env(:meshblu_performance_tools, :stream_uri))
-      {:ok, p } = MeshbluPerformanceTools.Process.start_link(%{
+      %URI{scheme: protocol, host: stream_host, port: stream_port} = URI.parse(uri)
+      {:ok, p } = MeshbluPerformanceTools.HTTP.Process.start_link(%{
         protocol: protocol,
         host: stream_host,
         port: stream_port
