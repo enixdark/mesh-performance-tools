@@ -8,17 +8,23 @@ defmodule Mix.Tasks.Cli do
   defp parse_args(args) do
     parse = args 
     |> OptionParser.parse(
-      switches: [logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, uri: :string, stream_uri: :string],
-      aliases: [l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri],
+      switches: [logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
+      aliases: [l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri, h: :host, p: :port, P: :protocol],
     )
     case parse do
-      {[], _, _} -> process(:help)
-      {opts, _, _} -> process(Keyword.merge([concurrency: Application.get_env(:meshblu_performance_tools, :concurrency), 
-                                             max_connection: Application.get_env(:meshblu_performance_tools, :max_connection), 
-                                             delay: Application.get_env(:meshblu_performance_tools, :delay), 
-                                             uri: Application.get_env(:meshblu_performance_tools, :uri),
-                                             stream_uri: Application.get_env(:meshblu_performance_tools, :stream_uri)], 
-                                             opts) |> Enum.sort)
+      {opts, [protocol | argv ], opts_without_parse} -> 
+        full_opts = (opts |> Enum.map(fn({k,v}) ->  "--#{k} #{v}"  end)) ++ (opts_without_parse |> Enum.map(fn({k,v}) ->  "#{k} #{v}"  end))
+        |> Enum.join(" ")
+        case protocol do
+          "http" -> 
+            "mix http #{full_opts}" |> Mix.shell.cmd #String.to_char_list |> :os.cmd
+            :ok
+          "mqtt" -> 
+             "mix mqtt #{full_opts}" |> Mix.shell.cmd
+            :ok
+          _ -> process(:help)
+        end
+      {_, _, _} -> process(:help)
       
     end
   end
@@ -26,49 +32,21 @@ defmodule Mix.Tasks.Cli do
 
   defp process(:help) do
     IO.puts """
-      Cli tool to test performance for meshblu
-
+      Cli tool to test performance for meshblu, select between http and mqtt
       Options:
         -c, --concurrency  Number of concurrent requests. Default: 1
         -n, --max_connection        Max number of total requests. Default: 10
         -d, --delay        Delay time for every request. Default: 1
-        -u, --uri    App      request to uri of meshblu service . Default: localhost:3000
-        -s, --stream_uri   request to uri of stream meshblu service. Default: localhost:3001
+        -h, --host   request to hostname of meshblu service . Default: localhost
+        -p, --port   request to port of meshblu service . Default: 3000
+        -s, --protocol   protocol of meshblu service . Default: 3000
         -l, --logpath      path to save log
     """
     System.halt(0)
   end
 
-  defp process(opts) do
-    IO.inspect opts
-    case opts do
-      [concurrency: concurrency, delay: delay, max_connection: max_connection, stream_uri: stream_uri, uri: uri] -> 
-         Application.put_env(:meshblu_performance_tools, :concurrency, concurrency)
-         Application.put_env(:meshblu_performance_tools, :uri, uri)
-         Application.put_env(:meshblu_performance_tools, :stream_uri, stream_uri)
-         Application.put_env(:meshblu_performance_tools, :delay, delay)
-         Application.put_env(:meshblu_performance_tools, :max_connection, max_connection)
-         IO.puts Application.get_env(:meshblu_performance_tools, :max_connection)
-         Logger.info "Start services..................."
-         tasks = Enum.map(1..10, fn(i) -> Task.async(fn -> :poolboy.transaction(
-                          :register,
-                          fn(id) -> 
-                            MeshbluPerformanceTools.Register.register(id, uri)
-                          end,
-                          Application.get_env(:meshblu_performance_tools, :timeout)
-                        )
-           end)
-         end)
-         Enum.each(tasks, fn(task) -> IO.inspect(Task.await(task, Application.get_env(:meshblu_performance_tools, :timeout))) end)
-       _ ->
-         :ok
-    end
-  end
-
   def run(args) do
     Process.flag(:trap_exit, true)
-    Mix.Task.run "app.start", []
-
     args 
     |> parse_args 
     |> process
