@@ -1,3 +1,5 @@
+#!/usr/bin/env babel-node
+
 import * as util from 'util'
 import * as path from 'path'
 import * as url from 'url'

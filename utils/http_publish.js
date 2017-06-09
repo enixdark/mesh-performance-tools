@@ -1,3 +1,5 @@
+#!/usr/bin/env babel-node
+
 import * as util from 'util'
 import * as path from 'path'
 import * as url from 'url'
@@ -57,7 +59,7 @@ function main(){
   let username, password
   let uri = URL.parse(argv.u || "http://b37b29d6-2f62-48c8-84a5-7ea5477235db:259f6a54f27477ffc63342d2f1614f788bd9724a@ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:3000")
   let port = argv.p || uri.port
-  let host = argv.h || uri.hostname
+  let host = argv.hostname || uri.hostname
   let protocol = argv.s || uri.protocol
   let topic = argv.T || 'message'
   if(uri.auth){

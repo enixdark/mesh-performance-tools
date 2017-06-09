@@ -1,26 +1,28 @@
-  import Promise from 'bluebird'
-  import request from 'request'
-  import winston from 'winston'
-  import sleep from 'sleep'
+#!/usr/bin/env babel-node
 
-  import Meshblu from 'meshblu-mqtt'
-  const URL = require('url')
-  const argv = require('optimist')
-          .usage("Cli tool to test performance for meshblu")
-          // .options('r', { alias:'register', describe: 'register account from meshblu service' })
-          .options('T', { alias: 'topic', describe: 'topic to subscribe' })
-          .options('t', { alias: 'timeout', describe: 'timeout for every request. Default: 3' })
-          .options('u', { alias: 'uri', describe: 'request to uri of meshblu service . Default: localhost' })
-          .options('p', { alias: 'port', describe: 'port of meshblu service . Default: 1883' })
-          .options('b', { alias: 'hostname', describe: 'request to domain of mesh. Default: localhost' })
-          .options('U', { alias: 'username', describe: 'username of meshblu service'})
-          .options('P', { alias: 'password', describe: 'password of meshblu service'})
-          .options('s', { alias: 'protocol', describe: 'request to protocol of mesh select between https, http and mqtt. Default: http' })
-          .options('n', { alias: 'number', describe: 'number of request to send message' })
-          .options('c', { alias: 'qos', describe: 'qos if use ' })
-          .boolean('v', { alias: "verbose", describe: 'Verbose output' })
-          .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
-        .argv
+import Promise from 'bluebird'
+import request from 'request'
+import winston from 'winston'
+import sleep from 'sleep'
+
+import Meshblu from 'meshblu-mqtt'
+const URL = require('url')
+const argv = require('optimist')
+        .usage("Cli tool to test performance for meshblu")
+        // .options('r', { alias:'register', describe: 'register account from meshblu service' })
+        .options('T', { alias: 'topic', describe: 'topic to subscribe' })
+        .options('t', { alias: 'timeout', describe: 'timeout for every request. Default: 3' })
+        .options('u', { alias: 'uri', describe: 'request to uri of meshblu service . Default: localhost' })
+        .options('p', { alias: 'port', describe: 'port of meshblu service . Default: 1883' })
+        .options('b', { alias: 'hostname', describe: 'request to domain of mesh. Default: localhost' })
+        .options('U', { alias: 'username', describe: 'username of meshblu service'})
+        .options('P', { alias: 'password', describe: 'password of meshblu service'})
+        .options('s', { alias: 'protocol', describe: 'request to protocol of mesh select between https, http and mqtt. Default: http' })
+        .options('n', { alias: 'number', describe: 'number of request to send message' })
+        .options('c', { alias: 'qos', describe: 'qos if use ' })
+        .boolean('v', { alias: "verbose", describe: 'Verbose output' })
+        .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
+      .argv
 
 // babel-node mqtt_publish.js -m '{"devices": ["*"], "topic": "message", "payload": "test"}'
 

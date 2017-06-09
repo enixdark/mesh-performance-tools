@@ -1,24 +1,26 @@
-  import Promise from 'bluebird'
-  import sleep from 'sleep'
+#!/usr/bin/env babel-node
 
-  import Meshblu from 'meshblu-mqtt'
-  const URL = require('url')
-  const argv = require('optimist')
-          .usage("Cli tool to test performance for meshblu")
-          // .options('r', { alias:'register', describe: 'register account from meshblu service' })
-          .options('m', { alias:'messasge', describe: 'message to sent to meshblu service' })
-          .options('t', { alias: 'timeout', describe: 'timeout for every request. Default: 3' })
-          .options('u', { alias: 'uri', describe: 'request to uri of meshblu service . Default: localhost' })
-          .options('p', { alias: 'port', describe: 'port of meshblu service . Default: 1883' })
-          .options('b', { alias: 'hostname', describe: 'request to domain of mesh. Default: localhost' })
-          .options('U', { alias: 'username', describe: 'username of meshblu service'})
-          .options('P', { alias: 'password', describe: 'password of meshblu service'})
-          .options('s', { alias: 'protocol', describe: 'request to protocol of mesh select between https, http and mqtt. Default: http' })
-          .options('n', { alias: 'number', describe: 'number of request to send message' })
-          .options('c', { alias: 'qos', describe: 'qos if use ' })
-          .boolean('v', { alias: "verbose", describe: 'Verbose output' })
-          .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
-        .argv
+import Promise from 'bluebird'
+import sleep from 'sleep'
+
+import Meshblu from 'meshblu-mqtt'
+const URL = require('url')
+const argv = require('optimist')
+        .usage("Cli tool to test performance for meshblu")
+        // .options('r', { alias:'register', describe: 'register account from meshblu service' })
+        .options('m', { alias:'messasge', describe: 'message to sent to meshblu service' })
+        .options('t', { alias: 'timeout', describe: 'timeout for every request. Default: 3' })
+        .options('u', { alias: 'uri', describe: 'request to uri of meshblu service . Default: localhost' })
+        .options('p', { alias: 'port', describe: 'port of meshblu service . Default: 1883' })
+        .options('b', { alias: 'hostname', describe: 'request to domain of mesh. Default: localhost' })
+        .options('U', { alias: 'username', describe: 'username of meshblu service'})
+        .options('P', { alias: 'password', describe: 'password of meshblu service'})
+        .options('s', { alias: 'protocol', describe: 'request to protocol of mesh select between https, http and mqtt. Default: http' })
+        .options('n', { alias: 'number', describe: 'number of request to send message' })
+        .options('c', { alias: 'qos', describe: 'qos if use ' })
+        .boolean('v', { alias: "verbose", describe: 'Verbose output' })
+        .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
+      .argv
 
 let number_publish = 0
 let total = argv.n || 1

@@ -6,21 +6,9 @@ defmodule Mix.Tasks.Mqtt do
   require Logger
 
   @shortdoc "return mqtt"
-  
-  defp process(:help) do
-    IO.puts """
-      Cli tool to test performance for meshblu mqtt
 
-      Options:
-        -c, --concurrency  Number of concurrent requests. Default: 1
-        -n, --max_connection        Max number of total requests. Default: 10
-        -d, --delay        Delay time for every request. Default: 1
-        -h, --host   request to hostname of meshblu service . Default: localhost
-        -p, --port   request to port of meshblu service . Default: 3000
-        -s, --protocol   protocol of meshblu service . Default: 3000
-        -l, --logpath      path to save log
-    """
-    System.halt(0)
+  def title do
+    "mqtt"
   end
 
   defp process(opts) do

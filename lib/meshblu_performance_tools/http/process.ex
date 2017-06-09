@@ -17,23 +17,15 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   end
 
   def handle_cast({:subscribe, uuid, token}, state) do
-
-    :ibrowse.set_max_sessions("http://#{state[:host]}", state[:port], 1000)
-
+    :ibrowse.set_max_sessions("http://#{state[:host]}", state[:port], 10000)
     {:ok, worker_pid} = HTTPotion.spawn_worker_process("http://#{state[:host]}:#{state[:port]}/subscribe")
-    # IO.inspect worker_pid
-    # case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", 
-    #         [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token], ibrowse: [direct: worker_pid, stream_to: {self(), :once}], timeout: 500_000] do
-    # case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": "07d0fda7-2972-4aa7-b9d1-1c7e95adfe2f", "meshblu_auth_token": "ac17b5b772a1585df7fd61ff9bd6660cbbc7df0c"],
-    #     ibrowse: [direct: worker_pid, stream_to: {self(), :once}], timeout: 100_000] do
-     case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": "07d0fda7-2972-4aa7-b9d1-1c7e95adfe2f", "meshblu_auth_token": "ac17b5b772a1585df7fd61ff9bd6660cbbc7df0c"],
-        ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 10, max_sessions: 10], 
-                  timeout:  Application.get_env(:meshblu_performance_tools, :timeout)] do
+     case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token],
+        ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 10000, max_sessions: 10000], 
+                  timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           async_loop(id)
           {:noreply, state}
         _ ->
-          
           {:noreply, state}
     end
   end
@@ -42,23 +34,26 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     :ibrowse.stream_next(id)
     receive do
       {:ibrowse_async_headers, ^id, '200', headers} ->
-        IO.inspect headers
+        # IO.inspect headers
         async_loop(id)
       {:ibrowse_async_headers, ^id, status_code, _headers} ->
-        IO.inspect status_code
+        # IO.inspect status_code
         async_loop(id)
       {:ibrowse_async_response_timeout, ^id} ->
-        IO.inspect "timeout"
+        Logger.error "timeout"
         :timeout
+        # async_loop(id)
       {:error, :connection_closed_no_retry} ->
-        IO.inspect "error"
+        Logger.error "error"
         :error
+        # async_loop(id)
       {:ibrowse_async_response, ^id, data} ->
-        IO.inspect data
+        Logger.info inspect(self())
+        # IO.inspect data
         async_loop(id)
       {:ibrowse_async_response_end, ^id} ->
-        IO.inspect "end"
-        async_loop(id)
+        Logger.info "response end, the process exit #{:erlang.pid_to_list self()}"
+        # async_loop(id)
     end
   end
 

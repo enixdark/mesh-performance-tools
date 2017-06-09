@@ -9,6 +9,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bin": {
+    "http_publish": "./http_publish.js",
+    "http_subscribe": "./http_subscribe.js",
+    "mqtt_publish": "./mqtt_publish.js",
+    "mqtt_subscribe": "./http_publish.js",
+    "register": "./register.js"
+  },
   "devDependencies": {
     "async": "^2.4.1",
     "babel-cli": "^6.24.1",
