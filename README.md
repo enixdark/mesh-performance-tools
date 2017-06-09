@@ -1,19 +1,41 @@
 # MeshbluPerformanceTools
 
-**TODO: Add description**
+**TODO: This is cli tool to test a connect, subsribe, pushlish message to meshblu services, support http, mqtt protocol, websocket, coap'll support in th future**
 
-## Installation
+## Setup
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `meshblu_performance_tools` to your list of dependencies in `mix.exs`:
+###Requirement
 
-```elixir
-def deps do
-  [{:meshblu_performance_tools, "~> 0.1.0"}]
-end
-```
+- Elixir v1.4.x
+- Nodejs 
+- Python 2.7.x
+- Mongodb
+- Redis-server
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/meshblu_performance_tools](https://hexdocs.pm/meshblu_performance_tools).
+### How to Install app
+
+install all package for elixir app
+
+`mix deps.get`
+compile to generate tasks 
+
+`mix compile`
+generate binary file through escript
+
+`mix escript.build`
+
+use command to test
+
+`meshblu_performance_tools http`
+
+`meshblu_performance_tools mqtt`
+
+check help through command
+`meshblu_performance_tools -h`
+
+if you want to test in with mix you can use command:
+
+`mix cli httt` or `mix http`
+
+`mix cli mqtt` or `mix mqtt` 
 
