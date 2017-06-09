@@ -12,10 +12,13 @@ defmodule Mix.Tasks.Base do
           switches: [logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
           aliases: [l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri, h: :host, p: :port, P: :protocol],
         )
+        IEx.pry
 
         case parse do
           {[], _, _} -> process(:help)
           {opts, _, _} -> 
+
+            IO.puts Dict.get(opts,:n, nil)
             uri = URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
             host = uri.host
             port = Dict.get(opts,:port, nil)  || uri.port

@@ -19,7 +19,7 @@ defmodule MeshbluPerformanceTools.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [
-      extra_applications: [:logger,:httpotion, :poison, :ibrowse, :poolboy ,:gen_mqtt],
+      extra_applications: [:logger,:httpotion, :poison, :ibrowse, :poolboy ,:gen_mqtt,:yamerl, :nimble_csv],
       mod: {MeshbluPerformanceTools, []}
     ]
   end
@@ -40,7 +40,10 @@ defmodule MeshbluPerformanceTools.Mixfile do
       {:poolboy, "~> 1.5.1"},
       {:ibrowse, "~> 4.4.0"},
       {:logger_file_backend, "~> 0.0.9"},
-      {:gen_mqtt, "~> 0.3.1"}
+      {:gen_mqtt, "~> 0.3.1"},
+      {:nimble_csv, "~> 0.1.0"},
+      {:yamerl, "~> 0.4.0"}
+
     ]
   end
 end
