@@ -15,7 +15,6 @@ defmodule Mix.Tasks.Base do
           switches: [force: :boolean, mode: :string, logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
           aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri, H: :host, p: :port, P: :protocol],
         )
-
         case parse do
           {[], _, _} -> process(:help)
           {opts, _, non_opts} -> 
@@ -130,7 +129,7 @@ defmodule Mix.Tasks.Base do
       end
 
 
-      defp process(opts) do
+      defp process(_) do
         ""
       end
 
