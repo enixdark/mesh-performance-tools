@@ -47,7 +47,7 @@ config :meshblu_performance_tools, :mqtt, System.get_env("STREAM_URI") || "mqtt:
 
 config :meshblu_performance_tools, :concurrency, System.get_env("CONCURRENCY") || 1
 config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONNECTION") || 1
-config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 2_000
+config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 5_000
 config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 5_000_000
 
 

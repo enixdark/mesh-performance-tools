@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Http do
         :poolboy.transaction(:http,
                           fn(id) -> 
                             MeshbluPerformanceTools.HTTP.Register.subscriber(id, uri, head[:uuid], head[:token])
-                          end,5000)
+                          end,delay)
         if rem(count, concurrency) == 0, do: :timer.sleep(delay)                  
         if(count == max_connection) do''
           Logger.info "complete connect"
@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Http do
         :poolboy.transaction(:http,
                           fn(id) -> 
                             MeshbluPerformanceTools.HTTP.Register.subscriber(id, uri, head[:uuid], head[:token])
-                          end,5000)
+                          end,delay)
         if rem(count, concurrency) == 0, do: :timer.sleep(delay)                  
         if(data == []) do 
           Logger.info "complete connect"
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Http do
         :poolboy.transaction(:http,
                           fn(id) -> 
                             MeshbluPerformanceTools.HTTP.Register.subscriber(id, uri, head[:uuid], head[:token])
-                          end,5000)
+                          end,delay)
         if rem(count, concurrency) == 0, do: :timer.sleep(delay)
         if(count == max_connection) do''
           Logger.info "complete connect"

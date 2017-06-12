@@ -41,7 +41,7 @@ if you want to test in with mix you can use command:
 `mix cli mqtt` or `mix mqtt`
 
 
-For http, currently, it's only support subscriber with 2 mode:
+Currently, it's only support subscriber with 2 mode:
 
 - unique: use a uuid and token of a device that have registered
 - file: load a uuid and token of a device or devices that u define in file, for sample format file, please check it in samples/data
@@ -62,3 +62,14 @@ or
 `
 mix http -m file /home/cqshinn/GIT/meshblu_project/meshblu_performance_tools/samples/files/devices.yaml -c 10
 `
+
+for options , you'll have to provide at least a mode format to run tool, default options will load from config file in config/configs.ex. if you don't want to use default config, can use parameters via command:
+
+`mix cli -h`
+`mix http -h`
+`mix mqtt -h`
+
+or 
+
+`meshblu_performance_tools -h`
+

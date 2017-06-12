@@ -13,8 +13,9 @@ defmodule Mix.Tasks.Base do
         parse = args 
         |> OptionParser.parse(
           switches: [force: :boolean, mode: :string, logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
-          aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri, H: :host, p: :port, P: :protocol],
+          aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, H: :host, p: :port, P: :protocol],
         )
+        
         case parse do
           {[], _, _} -> process(:help)
           {opts, _, non_opts} -> 
@@ -68,7 +69,7 @@ defmodule Mix.Tasks.Base do
                                             delay: Dict.get(opts,:delay, nil) || Application.get_env(:meshblu_performance_tools, :delay), 
                                             uri: "#{protocol}://#{host}:#{port}",
                                             level: mode],
-                                            opts) |> Enum.sort, Enum.to_list(data), 0, Enum.to_list(data))
+                                            Dict.drop(opts,[:host, :port, :logpath, :prorotol]) ) |> Enum.sort, Enum.to_list(data), 0, Enum.to_list(data))
       end
 
   
