@@ -66,10 +66,40 @@ mix http -m file /home/cqshinn/GIT/meshblu_project/meshblu_performance_tools/sam
 for options , you'll have to provide at least a mode format to run tool, default options will load from config file in config/configs.ex. if you don't want to use default config, can use parameters via command:
 
 `mix cli -h`
+
 `mix http -h`
+
 `mix mqtt -h`
 
 or 
 
 `meshblu_performance_tools -h`
+
+
+### Log & Report
+
+#### Report
+
+Currently , this version's not support report
+
+Ongoing . . .
+
+#### Log
+
+default, Using console to output information, however if you don't want, you can output to logfile by uncomment line and config it in config/config.ex
+
+Example: 
+```
+config :logger,
+  backends: [{LoggerFileBackend, :info},
+             {LoggerFileBackend, :error}]
+
+config :logger, :info,
+  path: "logs/info.log",
+  level: :info
+
+config :logger, :error,
+  path: "logs/error.log",
+  level: :error
+```
 

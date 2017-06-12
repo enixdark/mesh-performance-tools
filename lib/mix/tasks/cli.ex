@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Cli do
     parse = args 
     |> OptionParser.parse(
         switches: [force: :boolean, mode: :string, logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
-        aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, s: :stream_uri, H: :host, p: :port, P: :protocol],
+        aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, H: :host, p: :port, P: :protocol],
     )
     case parse do
       {opts, [protocol | argv ], opts_without_parse} -> 
