@@ -6,6 +6,8 @@ services:
     command: ./run.sh
     ports:
       - "3000:3000"
+    healthcheck:
+      disable: true
     environment:
       - NODE_ENV=dev
       
@@ -16,16 +18,16 @@ services:
       - REDIS_URI=redis://redis:6379
       - CACHE_REDIS_URI=redis://redis:6379
       - FIREHOSE_REDIS_URI=redis://redis:6379
-      - ALIAS_SERVER_URI=http://0.0.0.0:3000
-      # - NAMESPACE=meshblu
-      # - JOB_TIMEOUT_SECONDS=30
-      # - CONNECTION_POOL_MAX_CONNECTIONS=100
-      # - DISABLE_LOGGING=true
+      - ALIAS_SERVER_URI=http://meshblu_server:3000
+      - NAMESPACE=meshblu
+      - JOB_TIMEOUT_SECONDS=30
+      - CONNECTION_POOL_MAX_CONNECTIONS=100
+      - DISABLE_LOGGING=true
       - JOB_LOG_REDIS_URI=redis://redis:6379
-      # - JOB_LOG_QUEUE=meshblu-core-log
-      # - JOB_LOG_SAMPLE_RATE=1.00
-      # - REQUEST_QUEUE_NAME=request:queue
-      # - RESPONSE_QUEUE_BASE_NAME=response:queue
+      - JOB_LOG_QUEUE=meshblu-core-log
+      - JOB_LOG_SAMPLE_RATE=1.00
+      - REQUEST_QUEUE_NAME=request:queue
+      - RESPONSE_QUEUE_BASE_NAME=response:queue
       - CONCURRENCY=4
       - MONGODB_URI=mongodb://mongodb:27017/meshblu-test
     links:
@@ -40,9 +42,11 @@ services:
     command: node command.js
     ports:
       - "3001:3001"
+    healthcheck:
+      disable: true
     environment:
       - PORT=3001
-      - ALIAS_SERVER_URI=''
+      - ALIAS_SERVER_URI=http://meshblu_server:3000
       - REDIS_URI=redis://redis:6379
       - CACHE_REDIS_URI=redis://redis:6379
       - FIREHOSE_REDIS_URI=redis://redis:6379
@@ -102,26 +106,29 @@ services:
     
   redis:
     container_name: redis
-    image: redis:alpine
+    image: redis #redis:alpine
     ports:
       - "6379:6379"
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-      resources:
-        limits:
-          cpus: '0.001'
-          memory: 50M
-        reservations:
-          cpus: '0.0001'
-          memory: 20M
+    # deploy:
+    #   replicas: 1
+    #   update_config:
+    #     parallelism: 2
+    #     delay: 10s
+    #   restart_policy:
+    #     condition: on-failure
+    #   resources:
+    #     limits:
+    #       cpus: '0.001'
+    #       memory: 50M
+    #     reservations:
+    #       cpus: '0.0001'
+    #       memory: 20M
   mongodb:
     container_name: mongodb
     image: mongo
+    expose:
+      - 27017
+      - 27018
     ports:
       - "27017:27107"
       - "27018:27018"

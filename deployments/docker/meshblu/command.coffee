@@ -19,21 +19,21 @@ options = [
     names: ['namespace', 'n']
     type: 'string'
     help: 'request/response queue namespace'
-    default: 'meshblu'
+    default: '{{NAMESPACE}}'
     env: 'NAMESPACE'
   }
   {
     names: ['request-queue-name']
     type: 'string'
     help: 'request queue namespace'
-    default: 'v2:request:queue'
+    default: '{{REQUEST_QUEUE_NAME}}'
     env: 'REQUEST_QUEUE_NAME'
   }
   {
     names: ['response-queue-base-name']
     type: 'string'
     help: 'response queue base namespace'
-    default: 'v2:response:queue'
+    default: '{{RESPONSE_QUEUE_BASE_NAME}}'
     env: 'RESPONSE_QUEUE_BASE_NAME'
   }
   {
@@ -114,28 +114,28 @@ options = [
     type: 'string'
     help: 'Job log queue name'
     env: 'JOB_LOG_QUEUE'
-    default: 'meshblu-core-log'
+    default: '{{JOB_LOG_QUEUE}}'
   }
   {
     name: 'job-log-sample-rate'
     type: 'number'
     help: 'Job log sample rate (0.00 to 1.00)'
     env: 'JOB_LOG_SAMPLE_RATE'
-    default: '0.00'
+    default: '{{JOB_LOG_SAMPLE_RATE}}'
   }
   {
     name: 'job-timeout-seconds'
     type: 'positiveInteger'
     help: 'Timeout for job execution'
     env: 'JOB_TIMEOUT_SECONDS',
-    default: 30
+    default: {{JOB_TIMEOUT_SECONDS}}
   }
   {
     name: 'max-connections'
     type: 'positiveInteger'
     help: 'Max number of redis connections of the http protocol'
     env: 'CONNECTION_POOL_MAX_CONNECTIONS',
-    default: 50
+    default: {{CONNECTION_POOL_MAX_CONNECTIONS}}
   }
   {
     name: 'meshblu-http-port'

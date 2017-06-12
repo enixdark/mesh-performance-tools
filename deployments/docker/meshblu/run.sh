@@ -11,6 +11,15 @@ sed -i s#{{JOB_LOG_REDIS_URI}}#${JOB_LOG_REDIS_URI}#g /usr/src/app/command.coffe
 sed -i s/{{MESHBLU_HTTP_PORT}}/${MESHBLU_HTTP_PORT}/g /usr/src/app/command.coffee
 sed -i s/{{PRIVATE_KEY_BASE64}}/${PRIVATE_KEY_BASE64}/g /usr/src/app/command.coffee
 sed -i s/{{PUBLIC_KEY_BASE64}}/${PUBLIC_KEY_BASE64}/g /usr/src/app/command.coffee
+sed -i s/{{NAMESPACE}}/${NAMESPACE}/g /usr/src/app/command.coffee
+sed -i s/{{REQUEST_QUEUE_NAME}}/${REQUEST_QUEUE_NAME}/g /usr/src/app/command.coffee
+sed -i s/{{RESPONSE_QUEUE_BASE_NAME}}/${RESPONSE_QUEUE_BASE_NAME}/g /usr/src/app/command.coffee
+sed -i s/{{CONNECTION_POOL_MAX_CONNECTIONS}}/${CONNECTION_POOL_MAX_CONNECTIONS}/g /usr/src/app/command.coffee
+sed -i s/{{JOB_TIMEOUT_SECONDS}}/${JOB_TIMEOUT_SECONDS}/g /usr/src/app/command.coffee
+sed -i s/{{JOB_LOG_QUEUE}}/${JOB_LOG_QUEUE}/g /usr/src/app/command.coffee
+sed -i s/{{JOB_LOG_SAMPLE_RATE}}/${JOB_LOG_SAMPLE_RATE}/g /usr/src/app/command.coffee
+sed -i s/{{DISABLE_LOGGING}}/${DISABLE_LOGGING}/g /usr/src/app/command.coffee
+
 
 #npm install -g pm2 
 #pm2 start process.json
