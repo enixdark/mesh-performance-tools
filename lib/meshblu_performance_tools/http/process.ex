@@ -2,7 +2,6 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   use GenServer
   # require Timex
   require Logger
-  require IEx 
   
   def start_link(args) do
     GenServer.start_link(__MODULE__,args, [])

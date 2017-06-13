@@ -1,8 +1,8 @@
 defmodule MeshbluPerformanceTools.MQTT.Process do
   use GenMQTT
   require Logger
-  require IEx
-  def start_link(opts \\ [host: "localhost", port: 1883, username: "47706d7d-a6db-4edd-b7a1-f7aebc5bef4e", password: "e6869b631aa3d521a842752f8ed7300d62fa9332"]) do
+
+  def start_link(opts \\ []) do
     GenMQTT.start_link(__MODULE__, self(), opts)
   end
 

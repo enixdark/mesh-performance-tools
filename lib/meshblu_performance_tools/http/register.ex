@@ -1,7 +1,6 @@
 defmodule MeshbluPerformanceTools.HTTP.Register do
   use GenServer
   require Logger
-  require IEx
 
   def start_link(args) do
     # Logger.info "start register...................."
@@ -50,7 +49,7 @@ defmodule MeshbluPerformanceTools.HTTP.Register do
     GenServer.cast(pid, {:subscriber, uri, uuid, token})
   end
 
-  def register(pid, uri) do
+  def register({pid, uri}) do
     GenServer.cast(pid, {:subscriber, uri})
   end
 

@@ -43,7 +43,7 @@ config :logger, level: :info
 
 config :meshblu_performance_tools, :uri, System.get_env("URI") || "http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:3001" #"http://localhost:3000"
 # config :meshblu_performance_tools, :stream_uri, System.get_env("STREAM_URI") || "http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:3001" #"http://localhost:3001"
-config :meshblu_performance_tools, :mqtt, System.get_env("STREAM_URI") || "mqtt://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:1883" #"http://localhost:1883"
+config :meshblu_performance_tools, :mqtt_uri, System.get_env("MQTT_URI") || "http://localhost:1883" #"http://localhost:1883"
 
 config :meshblu_performance_tools, :concurrency, System.get_env("CONCURRENCY") || 1
 config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONNECTION") || 1

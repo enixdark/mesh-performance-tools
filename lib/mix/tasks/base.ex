@@ -1,10 +1,13 @@
 require IEx;
 
 defmodule Mix.Tasks.Base do
+  
 
   #@shortdoc "return base"
   defmacro __using__(_) do
     quote do
+      require Logger
+
       def process(opts, [head|data], count, persistent_auth) do
         "ok"
       end
@@ -23,14 +26,13 @@ defmodule Mix.Tasks.Base do
             first = args |> Enum.find_index &(Regex.match?(~r/(-m|--mode)/, &1) ) 
             data = args |> Enum.slice(first..first+2)
                         |> Enum.at(-1)
-            check = data |> (&(Regex.match?(~r/(-f|--force|--logpath|-l|-n|--max_connection|--delay|-d|-P|--protocol|-c|--concurrency|-H|--host|-p|--port)/, &1))).()
+            check = data |> (&(Regex.match?(~r/(-f$|--force$|--logpath$|-l$|-n$|--max_connection$|--delay$|-d$|-P$|--protocol$|-c$|--concurrency$|-H$|--host$|-p$|--port$)/, &1))).()
 
             if data != "unique" && String.to_atom(Dict.get(opts,:mode,"")) in [:unique, :file, :db_url] && !check do
               case String.to_atom(Dict.get(opts,:mode,"")) do
                 :unique -> 
                   [uuid, token] = data |> String.split ":"
                   opts |> process_parse([%{uuid: uuid, token: token}])
-
                 :file -> 
                   clean_data = case detect_format_file(data) do
                     :json -> 
@@ -60,7 +62,10 @@ defmodule Mix.Tasks.Base do
           true -> :multi
           _ -> :once    
         end
-        uri = URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
+        uri = case title do
+          :mqtt ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :mqtt_uri))
+          _ ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
+        end
         host = uri.host
         port = Dict.get(opts,:port, nil)  || uri.port
         protocol = Dict.get(opts,:protocol, nil)  || uri.scheme
@@ -85,7 +90,7 @@ defmodule Mix.Tasks.Base do
       end
 
       def title do
-        "base"
+        :base
       end
 
       defp process(:mode) do
@@ -135,11 +140,40 @@ defmodule Mix.Tasks.Base do
       end
 
       defp loop() do
+        Logger.info "complete connect"
         receive do
           _ -> loop()
         end
       end
 
+      defp handle_event(uuid, token, options) do
+        :ok
+      end
+
+      def process(opts, [head|data], count, persistent_auth) do
+        case opts do
+          [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
+            handle_event(head[:uuid], head[:token], opts)  
+            if (rem(count, concurrency) == 0), do: :timer.sleep(delay)                  
+            if (count == max_connection), do: loop()
+            process(opts, data, count + 1, nil)
+          [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] ->        
+            handle_event(head[:uuid], head[:token], opts)      
+            if rem(count, concurrency) == 0, do: :timer.sleep(delay)                  
+            if (data == []), do: loop()
+            process(opts, data, count + 1, nil)
+          [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
+            handle_event(head[:uuid], head[:token], opts) 
+            if rem(count, concurrency) == 0, do: :timer.sleep(delay)
+            if (count == max_connection), do: loop()
+            cond do
+              data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)
+              true -> process(opts, data, count + 1, persistent_auth)
+            end
+          _ ->
+            :ok
+        end
+      end
 
       def run(args) do
         Process.flag(:trap_exit, true)
@@ -149,7 +183,7 @@ defmodule Mix.Tasks.Base do
         |> process
       end
 
-      defoverridable [parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2]
+      defoverridable [parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
     end
   end
 end
