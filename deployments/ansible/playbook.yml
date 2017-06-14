@@ -1,0 +1,17 @@
+--- 
+# - hosts: redis
+#   gather_facts: true
+#   vars_files:
+#     - ./environments/development/redis.yml
+#   roles:
+#     - redis
+#   become: yes
+
+- hosts: mongo
+  strategy: debug
+  gather_facts: no
+  vars_files:
+    - ./environments/development/mongo.yml
+  roles:
+    - mongo
+  become: yes

@@ -1,0 +1,22 @@
+- name: "update and upgrade ubuntu"
+  apt: update_cache=yes cache_valid_time=3600
+  tags:
+    - update
+- name: update and install elixir
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items:
+    - elixir
+  tags:
+    - install
+- stat: path=/etc/redis/redis.conf
+  register: redis
+- stat: path=/etc/redis/sentinel.conf
+  register: sentinel
+- name: copy redis config file to server
+  copy: src=./roles/redis/files/redis.conf dest=/etc/redis/redis.conf mode=0644
+  when: not redis.stat.exists
+  notify: restart redis server
+- name: copy redis sentinel config file to server
+  copy: src=./roles/redis/files/sentinel.conf dest=/etc/redis/sentinel.conf mode=0644
+  when: not sentinel.stat.exists
+  notify: restart redis server

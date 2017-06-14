@@ -1,0 +1,6 @@
+register_name_mongodb: mongodb
+mongodb_port: 27017
+mongodb_api_port: 28017
+mongodb_user: user
+mongodb_database: database
+mongodb_pass: password

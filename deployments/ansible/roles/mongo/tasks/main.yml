@@ -1,0 +1,25 @@
+- name: "add a key repo"
+  apt_key:
+    keyserver: hkp://keyserver.ubuntu.com:80
+    id: 0C49F3730359A14518585931BC711F9BA15703C6
+  tags: add key
+- name: wrong variable
+  ping: data={{ wrong_var }}
+# - name: "add repo into source"
+#   command: deb [ arch=amd64 ] http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-3.4.list
+- name: "update and upgrade ubuntu"
+  apt: update_cache=yes cache_valid_time=3600
+  tags:
+    - update
+- name: update and install mongodb server
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items:
+    - mongodb-server
+  tags:
+    - install
+- stat: path=/etc/mongodb.conf
+  register: mongodb
+- name: copy mongodb config file to server
+  copy: src=./roles/mongodb/files/mongodb.conf dest=/etc/mongodb.conf mode=0644
+  when: not mongodb.stat.exists
+  notify: restart mongo server

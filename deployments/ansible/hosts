@@ -1,0 +1,17 @@
+[redis]
+redis ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[mongo]
+mongo ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[meshblu_server]
+meshblu_server ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[meshblu_stream]
+meshblu_stream ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[meshblu_mqtt]
+meshblu_mqtt ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[cli]
+cli ansible_ssh_host=10.0.0.10 ansible_ssh_port=22 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
