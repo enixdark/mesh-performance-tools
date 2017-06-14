@@ -21,7 +21,6 @@ const argv = require('optimist')
         .options('l', { alias: 'logpath', describe: 'path to save log' })
         .boolean('v', { alias: "verbose", describe: 'Verbose output' })
         .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
-
         .argv
 
 const URL = require('url');
@@ -73,17 +72,23 @@ function main(){
   let host = argv.hostname || uri.hostname
   let protocol = argv.s || uri.protocol
   let number = argv.n || 1
+  let concurrency = argv.c || 1
   meshbluHttp = Promise.promisifyAll(new MeshbluHttp({
       protocol: protocol, 
       hostname: host,
       port: port
   }))  
-  for(var i = 0; i < number; i++)
+  let avg = number / concurrency
+  // for(var i = 0; i < avg; i++){
+  //   for(var j = 0; j < concurrency; j++){
+  //     register({protocol, host, port})
+  //   }
+  //   sleep.sleep(3)
+  // }
+  for(var i = 0; i < number; i++){
     register({protocol, host, port})
     
-
-
-
+  }
 }
 
 main()

@@ -9,11 +9,54 @@ defmodule Mix.Tasks.Http do
     :http
   end
 
-  defp handle_even(uuid, token, options) do
+  def handle_event(uuid, token, options) do
     :poolboy.transaction(:http,
                           fn(id) -> 
                             MeshbluPerformanceTools.HTTP.Register.subscriber(id, options[:uri], uuid, token)
                           end,options[:delay])
+    
   end
 
+  def process(opts, [head|data], count, persistent_auth) do
+    case opts do
+      [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
+        handle_event(head[:uuid], head[:token], opts)  
+        if (rem(count, concurrency) == 0) do
+          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          :timer.sleep(delay)    
+        end
+        if (count == max_connection) do
+           Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
+           loop()
+        end
+        process(opts, data, count + 1, nil)
+      [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] -> 
+        handle_event(head[:uuid], head[:token], opts) 
+        if rem(count, concurrency) == 0 do
+          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          :timer.sleep(delay)    
+        end                 
+        if (data == []) do
+          Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
+          loop()
+        end
+        process(opts, data, count + 1, nil)
+      [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
+        handle_event(head[:uuid], head[:token], opts) 
+        if rem(count, concurrency) == 0 do
+          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          :timer.sleep(delay)    
+        end
+        if (count == max_connection) do 
+          Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
+          loop()
+        end
+        cond do
+          data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)
+          true -> process(opts, data, count + 1, persistent_auth)
+        end
+      _ ->
+        :ok
+    end
+  end
 end

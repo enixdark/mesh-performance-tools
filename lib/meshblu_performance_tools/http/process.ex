@@ -2,7 +2,8 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   use GenServer
   # require Timex
   require Logger
-  
+  require IEx
+
   def start_link(args) do
     GenServer.start_link(__MODULE__,args, [])
   end
@@ -15,6 +16,10 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     GenServer.cast(pid, {:subscribe, uuid, token})
   end
 
+
+  @doc """
+  event subscriber via http streaming
+  """
   def handle_cast({:subscribe, uuid, token}, state) do
     :ibrowse.set_max_sessions("http://#{state[:host]}", state[:port], 10000)
     {:ok, worker_pid} = HTTPotion.spawn_worker_process("http://#{state[:host]}:#{state[:port]}/subscribe")
@@ -22,6 +27,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 10000, max_sessions: 10000], 
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
+          Logger.info "#{uuid} with pid #{:erlang.pid_to_list self()} subscribed"
           async_loop(id)
           {:noreply, state}
         _ ->
@@ -29,6 +35,10 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     end
   end
 
+  @doc """
+  listen a http stream when a client request 
+  a subscribe connection to meshblu server 
+  """
   def async_loop(id) do
     :ibrowse.stream_next(id)
     receive do

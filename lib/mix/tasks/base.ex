@@ -74,7 +74,7 @@ defmodule Mix.Tasks.Base do
                                             delay: Dict.get(opts,:delay, nil) || Application.get_env(:meshblu_performance_tools, :delay), 
                                             uri: "#{protocol}://#{host}:#{port}",
                                             level: mode],
-                                            Dict.drop(opts,[:host, :port, :logpath, :prorotol]) ) |> Enum.sort, Enum.to_list(data), 0, Enum.to_list(data))
+                                            Dict.drop(opts,[:host, :port, :logpath, :prorotol]) ) |> Enum.sort, Enum.to_list(data), 1, Enum.to_list(data))
       end
 
   
@@ -140,13 +140,13 @@ defmodule Mix.Tasks.Base do
       end
 
       defp loop() do
-        Logger.info "complete connect"
         receive do
-          _ -> loop()
+          _ -> 
+            loop()
         end
       end
 
-      defp handle_event(uuid, token, options) do
+      def handle_event(uuid, token, options) do
         :ok
       end
 
@@ -154,17 +154,26 @@ defmodule Mix.Tasks.Base do
         case opts do
           [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
             handle_event(head[:uuid], head[:token], opts)  
-            if (rem(count, concurrency) == 0), do: :timer.sleep(delay)                  
+            if (rem(count, concurrency) == 0) do
+              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              :timer.sleep(delay)    
+            end
             if (count == max_connection), do: loop()
             process(opts, data, count + 1, nil)
-          [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] ->        
+          [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] -> 
             handle_event(head[:uuid], head[:token], opts)      
-            if rem(count, concurrency) == 0, do: :timer.sleep(delay)                  
+            if rem(count, concurrency) == 0 do
+              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              :timer.sleep(delay)    
+            end                 
             if (data == []), do: loop()
             process(opts, data, count + 1, nil)
           [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
             handle_event(head[:uuid], head[:token], opts) 
-            if rem(count, concurrency) == 0, do: :timer.sleep(delay)
+            if rem(count, concurrency) == 0 do
+              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              :timer.sleep(delay)    
+            end
             if (count == max_connection), do: loop()
             cond do
               data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)

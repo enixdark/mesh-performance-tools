@@ -64,7 +64,7 @@ defmodule Mix.Tasks.Cli do
   end
 
   def run(args) do
-    Process.flag(:trap_exit, true)
+    # Process.flag(:trap_exit, true)
     args 
     |> parse_args 
     |> process
