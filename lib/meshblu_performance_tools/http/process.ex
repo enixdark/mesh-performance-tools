@@ -40,7 +40,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   a subscribe connection to meshblu server 
   """
   def async_loop(id, uuid) do
-    # :ibrowse.stream_next(id)
+    :ibrowse.stream_next(id)
     receive do
       {:ibrowse_async_headers, ^id, '200', headers} ->
         # IO.inspect headers
