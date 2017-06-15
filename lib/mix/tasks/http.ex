@@ -10,10 +10,9 @@ defmodule Mix.Tasks.Http do
   end
 
   def handle_event(uuid, token, options) do
-    :poolboy.transaction(:http,
-                          fn(id) -> 
-                            MeshbluPerformanceTools.HTTP.Register.subscriber(id, options[:uri], uuid, token)
-                          end,options[:delay])
+
+    {:ok, pid} = MeshbluPerformanceTools.HTTP.Register.start_link([])
+    MeshbluPerformanceTools.HTTP.Register.subscriber(pid, options[:uri], uuid, token)
     
   end
 

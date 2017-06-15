@@ -28,7 +28,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           Logger.info "#{uuid} with pid #{:erlang.pid_to_list self()} subscribed"
-          async_loop(id)
+          async_loop(id, uuid)
           {:noreply, state}
         _ ->
           {:noreply, state}
@@ -39,29 +39,29 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   listen a http stream when a client request 
   a subscribe connection to meshblu server 
   """
-  def async_loop(id) do
-    :ibrowse.stream_next(id)
+  def async_loop(id, uuid) do
+    # :ibrowse.stream_next(id)
     receive do
       {:ibrowse_async_headers, ^id, '200', headers} ->
         # IO.inspect headers
-        async_loop(id)
+        async_loop(id, uuid)
       {:ibrowse_async_headers, ^id, status_code, _headers} ->
         # IO.inspect status_code
-        async_loop(id)
+        async_loop(id, uuid)
       {:ibrowse_async_response_timeout, ^id} ->
-        Logger.error "timeout"
+        Logger.error "device with #{uuid} has timeout"
         :timeout
         # async_loop(id)
       {:error, :connection_closed_no_retry} ->
-        Logger.error "error"
+        Logger.error "device with #{uuid} connection closed"
         :error
         # async_loop(id)
       {:ibrowse_async_response, ^id, data} ->
-        Logger.info inspect(self())
+        Logger.info "#{uuid} - #{:erlang.pid_to_list self()} received #{inspect(data)}"
         # IO.inspect data
-        async_loop(id)
+        async_loop(id, uuid)
       {:ibrowse_async_response_end, ^id} ->
-        Logger.info "response end, the process exit #{:erlang.pid_to_list self()}"
+        Logger.info "response end, #{uuid} with the process #{:erlang.pid_to_list self()} exit"
         # async_loop(id)
     end
   end

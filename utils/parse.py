@@ -1,15 +1,15 @@
 from __future__ import absolute_import
 
-import pandas as pd
+# import pandas as pd
 import json
 
 import argparse
 import logging
 import re
 
-import apache_beam as beam
-from apache_beam.io import (ReadFromText, WriteToText)
-from apache_beam.options.pipeline_options import (PipelineOptions, SetupOptions, StandardOptions)
+# import apache_beam as beam
+# from apache_beam.io import (ReadFromText, WriteToText)
+# from apache_beam.options.pipeline_options import (PipelineOptions, SetupOptions, StandardOptions)
 
 # class ProcessBeamFn(beam.DoFn):
 #     def process(self, element):
@@ -53,7 +53,7 @@ def main(argv=None):
                 })
             except:
                 pass
-        with open('../samples/files/rdevices.json', 'w+') as w:
+        with open('../samples/files/devices.json', 'w+') as w:
             w.write(json.dumps({
                 "devices": data
             }, indent=4 ))

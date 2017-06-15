@@ -17,9 +17,9 @@ defmodule MeshbluPerformanceTools do
         # Define workers and child supervisors to be supervised
         #  :hackney_pool.child_spec(:first_pool,  [timeout: Application.get_env(:meshblu_performance_tools, :timeout), 
         #                                         max_connections: Application.get_env(:meshblu_performance_tools, :max_connection)]),
-         :poolboy.child_spec(:register, poolboy_config(MeshbluPerformanceTools.HTTP.Register, :http,  10000),[]),
-         :poolboy.child_spec(:client, poolboy_config(MeshbluPerformanceTools.MQTT.Client, :client,  1), 
-          []),
+        #  :poolboy.child_spec(:register, poolboy_config(MeshbluPerformanceTools.HTTP.Register, :http,  10000),[]),
+        #  :poolboy.child_spec(:client, poolboy_config(MeshbluPerformanceTools.MQTT.Client, :client,  1), 
+          # []),
     ]
     opts = [strategy: :one_for_one, name: MeshbluPerformanceTools.Supervisor]
     Supervisor.start_link(children, opts)

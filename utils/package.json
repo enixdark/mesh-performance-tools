@@ -17,7 +17,7 @@
     "register": "./register.js"
   },
   "devDependencies": {
-    "async": "^2.4.1",
+    // "async": "^2.4.1",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
@@ -26,12 +26,11 @@
     "colors": "^1.1.2",
     "eslint": "^3.19.0",
     "eslint-plugin-babel": "^4.1.1",
-    "locks": "^0.2.2",
     "meshblu-http": "^9.9.0",
     "meshblu-mqtt": "^4.0.2",
     "optimist": "^0.6.1",
+    "request-promise": "^4.2.1",
     "sleep": "^5.1.1",
-    "uws": "^0.14.5",
     "winston": "^2.3.1"
   }
 }
