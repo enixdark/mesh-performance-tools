@@ -7,7 +7,7 @@ import logging
 import json 
 import gevent
 from gevent import monkey
-
+import time
 monkey.patch_all()
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         help="Number of concurrent requests", default=1)
     parser.add_option(
         "-d", "--delay", dest="delay",
-        help="Delay time for every request", default=1000)
+        help="Delay time for every request", default=1)
     parser.add_option(
         "-P", "--protocol", dest="protocol",
         help="which protocal to use", default="http")
@@ -75,17 +75,37 @@ if __name__ == '__main__':
 
     concurrency = int(options.concurrency) if type(options.concurrency) is str else options.concurrency
     total = int(options.total) if type(options.total) is str else options.total
-
+    count = 0
+    threads = []
     uri_cleaned = protocol + "://" + host + ":" + str(port)
     if options.body:
         if os.path.isfile(options.body):
-            data = json.loads(options.body)['devices']
-            gevent.joinall([gevent.spawn(register_with_custom_server, uri_cleaned, data[i]) for i in xrange(len(data))])
+            data = json.loads(options.body)['devices']            
+            for i in xrange(len(data)):
+                if count == concurrency:
+                    count = 0
+                    time.sleep(delay)
+                threads.append(gevent.spawn(register_with_custom_server, uri_cleaned, data[i]))
+                count = count + 1
+            gevent.joinall(threads)
+
         else:
             body = reduce(lambda x,y: dict(x, **{y[0]: y[1]}), 
                       map(lambda x: re.split(r'=(.+)',x)[0:2], options.body.split(";")), {}
                    )
-            gevent.joinall([gevent.spawn(register_with_custom_server, uri_cleaned, body)for i in xrange(total)])
+            for i in xrange(total):
+                if count == concurrency:
+                    count = 0
+                    time.sleep(delay)
+                threads.append(gevent.spawn(register_with_custom_server, uri_cleaned, body))
+                count = count + 1
+            gevent.joinall(threads)
     else:
-        gevent.joinall([gevent.spawn(register_default, uri_cleaned) for i in xrange(total)])
+        for i in xrange(total):
+            if count == concurrency:
+                count = 0
+                time.sleep(delay)
+            threads.append(gevent.spawn(register_default, uri_cleaned))
+            count = count + 1
+        gevent.joinall(threads)
             
