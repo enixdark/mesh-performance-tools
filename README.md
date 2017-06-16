@@ -103,3 +103,68 @@ config :logger, :error,
   level: :error
 ```
 
+### Register, Subscribe, Publish and Create devices file 
+
+Please check it in `utils` folder, this folder include some cli tool to use for meshblu server.
+
+Before use, please install Node.js or Python:
+
+
+For Python:
+
+please use pyenv, or virtualenv ans install package through pip:
+
+pip install -r requirements.txt
+
+then, to check all options use:
+
+`python register.py -h`
+
+to register one or many devices, use register cli:
+
+```python register.py -n [number]```
+
+or for custom server and body params, use: 
+
+```python register.py --body "subscriberAccount=QN0000000;serialNumber=QN00000001;check=vTanJPNjzXCunbklJVVOPg==" -H http://localhost:3000 -n 10```
+
+or to load devices from a file use:
+
+```python register.py --body path/log.json -H http://localhost:3000 -n 10```
+
+note: this version of cli only support json
+
+---
+
+For Node.js:
+
+install babel node to use for cli tool 
+
+`npm i -g babel-cli`
+
+install all package to use for cli tools
+
+`npm i package.json`
+
+
+then, to check all options use:
+
+`babel-node register -h`
+
+to register one or many devices, use register cli:
+
+```babel-node register.js -n [number]```
+
+or for custom server and body params, use: 
+
+```babel-node register.js --body "subscriberAccount=QN0000000;serialNumber=QN00000001;check=vTanJPNjzXCunbklJVVOPg==" -u http://localhost:3000 -n 10```
+
+or to load devices from a file use:
+
+```babel-node register.js --body path/log.json -u http://localhost:3000 -n 10```
+
+### Parsing  sample data file
+
+To generate a sample data file from logfile use
+ 
+`python parse.py` 
