@@ -22,11 +22,14 @@ const argv = require('optimist')
         .boolean('h', { alias: 'help', describe: 'Print this usage and exit' })
         .argv
 
-const URL = require('url');
+const URL = require('url')
 const MeshbluHttp = require('meshblu-http')
 const fs = Promise.promisifyAll(require('fs'))
-
+const bunyan = require('bunyan')
+const RotatingFileStream = require('bunyan-rotating-file-stream')
 let logger = console
+let log_path = argv.l || `../logs/devices.log`
+let stream = fs.createWriteStream(log_path, { flags : 'w' })
 
 let meshbluHttp
 
@@ -45,10 +48,10 @@ function usage(exit) {
 function register({protocol, host, port}){
     return meshbluHttp.registerAsync({})
             .then( res => {
-              logger.log('info', Object.assign(res, {protocol, host, port }))
+              logger.info(Object.assign(res, {protocol, host, port }))
             })
             .catch(function(error){
-              logger.log('error', error)
+              logger.info(error)
             })
 }
 
@@ -63,10 +66,10 @@ function register_custom_server({protocol, host, port, body}){
               json: true 
             })
             .then( res => {
-              logger.log('info', Object.assign(res, {protocol, host, port }))
+              logger.info(Object.assign(res, {protocol, host, port }))
             })
             .catch(function(error){
-              logger.log('error', error)
+              logger.info(error)
             })
 }
 
@@ -74,16 +77,41 @@ function register_custom_server({protocol, host, port, body}){
 
 
 function main(){
-  if(!argv.v){
-    logger = winston
-    let log_path = argv.l || `../logs/devices.log`
-    winston.configure({
-        level: 'debug',
-        transports: [
-            new (winston.transports.File)({ filename: log_path })
-        ]
-    })
-  }
+
+  let log_path = argv.l || `../logs/devices.log`
+  let stream = fs.createWriteStream(log_path, { flags : 'w' });
+
+  // if(!argv.v){
+    
+  //   let log_path = argv.l || `../logs/devices.log`
+  //   logger = bunyan.createLogger({
+  //     name: 'regiter',
+  //     streams: [{
+  //           type: 'raw',
+  //           stream: new RotatingFileStream({
+  //               path: log_path,
+  //               period: '1d',          // daily rotation 
+  //               totalFiles: 10,        // keep 10 back copies 
+  //               rotateExisting: true,  // Give ourselves a clean file when we start up, based on period 
+  //               threshold: '10m',      // Rotate log files larger than 10 megabytes 
+  //               totalSize: '20m',      // Don't keep more than 20mb of archived log files 
+  //               gzip: true             // Compress the archive log files to save space 
+  //           })
+  //     }]
+  //     // streams: [
+  //     //   {
+  //     //     level: 'info',
+  //     //     // stream: procedss.stdout
+  //     //     stream: process.stdout
+  //     //   },
+  //     //   {
+  //     //     level: 'error',
+  //     //     // stream: process.stdout
+  //     //     path: log_path
+  //     //   }
+  //     // ]
+  //   })
+  // }
 
   
   if(argv.h){
@@ -113,14 +141,16 @@ function main(){
     fs.statAsync(argv.body)
     .then( res => fs.readFileAsync(argv.body))
     .then( res => {
-
+      
       let list = JSON.parse(res)['devices']
       let number = list.length
       for(var i = 0; i < number; i++){ 
-        logger.log('info', i)
+        stream.write(str(i))
         let body = list[i]
+        // sleep.sleep(1)
         // register_custom_server({protocol, host, port, body})
       }
+      // stream.end()
     })
     .catch( err => {
       let body = err.path.split(';').map( item => item.split(/=(.+)/).slice(0,2) )
@@ -138,33 +168,3 @@ function main(){
 }
 
 main()
-
-
-
-
-
-
-// hieult
-// 4:51 PM
-// api: /devices/register
-// 4:51
-// {"subscriberAccount":"QN0000001",
-// "serialNumber":"QN12345678",
-// "check":"X4mwC3OD\/zqYSE8r6qfjeA=="}
-// 4:52
-// sub account thi fixed
-// 4:52
-// serial number: chu de tu 1 den 99999
-// 4:52
-// check tinh theo cong thuc
-// 4:53
-// String rawString = subscriberAccount + length1 + length2 + serialNumber;
-// cộng chuỗi thôi
-// length1 là length của subscriberAccount
-// length2 là length của serialNumber
-// hash md5
-// encode base64
-// 4:53
-// port goi api :8080
-// 4:53
-// tao xong luu lại cho anh bảng uuid + token tra lai dang csv nhe
