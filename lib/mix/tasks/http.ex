@@ -19,23 +19,24 @@ defmodule Mix.Tasks.Http do
   def process(opts, [head|data], count, persistent_auth) do
     case opts do
       [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
+
         handle_event(head[:uuid], head[:token], opts)  
         if (rem(count, concurrency) == 0) do
           Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
           :timer.sleep(delay)    
         end
-        if (count == max_connection) do
+        if (count >= max_connection) do
            Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
            loop()
         end
         process(opts, data, count + 1, nil)
-      [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] -> 
+      [concurrency: concurrency, delay: delay, level: :once, max_connection: max_connection, mode: _, uri: uri] -> 
         handle_event(head[:uuid], head[:token], opts) 
         if rem(count, concurrency) == 0 do
           Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
           :timer.sleep(delay)    
         end                 
-        if (data == []) do
+        if (data == [] || count == max_connection) do
           Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
           loop()
         end
@@ -46,7 +47,7 @@ defmodule Mix.Tasks.Http do
           Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
           :timer.sleep(delay)    
         end
-        if (count == max_connection) do 
+        if (count >= max_connection) do 
           Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
           loop()
         end
