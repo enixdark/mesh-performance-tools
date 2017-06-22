@@ -7,7 +7,8 @@ defmodule Mix.Tasks.Base do
   defmacro __using__(_) do
     quote do
       require Logger
-
+      alias EctoMnesia.Table
+      require IEx
       def process(opts, [head|data], count, persistent_auth) do
         "ok"
       end
@@ -29,6 +30,11 @@ defmodule Mix.Tasks.Base do
             check = data |> (&(Regex.match?(~r/(-f$|--force$|--logpath$|-l$|-n$|--max_connection$|--delay$|-d$|-P$|--protocol$|-c$|--concurrency$|-H$|--host$|-p$|--port$)/, &1))).()
 
             if data != "unique" && String.to_atom(Dict.get(opts,:mode,"")) in [:unique, :file, :db_url] && !check do
+              # Table.insert(:meshblu, {:meshblu, :key, System.system_time(:second), 0, [], [], 0})
+              :ets.new(:errors, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
+              :ets.new(:success, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
+              :ets.new(:messages, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
+
               case String.to_atom(Dict.get(opts,:mode,"")) do
                 :unique -> 
                   [uuid, token] = data |> String.split ":"
@@ -188,11 +194,22 @@ defmodule Mix.Tasks.Base do
         Process.flag(:trap_exit, true)
         Mix.Task.run "app.start", []
         args 
-        |> parse_args 
+        |> parse_args
         |> process
       end
 
-      defoverridable [parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
+      def report do
+        :ok
+        # success_size = :success |> :ets.tab2list |> Enum.count 
+        # error_size = :errors |> :ets.tab2list |> Enum.count
+        # messages_size = :messages |> :ets.tab2list |> Enum.count
+        # :ets.delete_all_objects :messages
+        # Logger.info "success/errors/connecting/messages: #{success_size}/#{error_size}/#{success_size - error_size}/#{messages_size}"
+      end
+
+      defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
     end
   end
+
+  
 end

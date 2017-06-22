@@ -3,10 +3,12 @@ require IEx;
 defmodule Mix.Tasks.Http do
   use Mix.Task
   use Mix.Tasks.Base
+  alias EctoMnesia.Table
 
   @shortdoc "return http"
   def title do
     :http
+    
   end
 
   def handle_event(uuid, token, options) do
@@ -22,29 +24,28 @@ defmodule Mix.Tasks.Http do
 
         handle_event(head[:uuid], head[:token], opts)  
         if (rem(count, concurrency) == 0) do
-          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          # Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          report
           :timer.sleep(delay)    
         end
         if (count >= max_connection) do
-           Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
            loop()
         end
         process(opts, data, count + 1, nil)
       [concurrency: concurrency, delay: delay, level: :once, max_connection: max_connection, mode: _, uri: uri] -> 
         handle_event(head[:uuid], head[:token], opts) 
         if rem(count, concurrency) == 0 do
-          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          report
           :timer.sleep(delay)    
         end                 
         if (data == [] || count == max_connection) do
-          Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
           loop()
         end
         process(opts, data, count + 1, nil)
       [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
         handle_event(head[:uuid], head[:token], opts) 
         if rem(count, concurrency) == 0 do
-          Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+          report
           :timer.sleep(delay)    
         end
         if (count >= max_connection) do 
@@ -58,5 +59,11 @@ defmodule Mix.Tasks.Http do
       _ ->
         :ok
     end
+  end
+
+  defp loop() do
+    report
+    :timer.sleep(1000)
+    loop()
   end
 end
