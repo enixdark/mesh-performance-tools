@@ -3,6 +3,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   # require Timex
   require Logger
   require IEx
+  alias EctoMnesia.Table
 
   def start_link(args) do
     GenServer.start_link(__MODULE__,args, [])
@@ -28,6 +29,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           Logger.info "#{uuid} with pid #{:erlang.pid_to_list self()} subscribed"
+          :ets.insert(:success, {uuid})
           async_loop(id, uuid)
           {:noreply, state}
         _ ->
@@ -50,20 +52,29 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         async_loop(id, uuid)
       {:ibrowse_async_response_timeout, ^id} ->
         Logger.error "device with #{uuid} has timeout"
+        :ets.insert(:errors, {uuid})
         :timeout
         # async_loop(id)
       {:error, :connection_closed_no_retry} ->
         Logger.error "device with #{uuid} connection closed"
+        :ets.insert(:errors, {uuid})
         :error
         # async_loop(id)
       {:ibrowse_async_response, ^id, data} ->
-        Logger.info "#{uuid} - #{:erlang.pid_to_list self()} received #{inspect(data)}"
-        # IO.inspect data
+        if data != [] do
+          :ets.insert(:messages, {true})
+          Logger.info "#{uuid} - #{:erlang.pid_to_list self()} received #{inspect(data)}"
+        end
+        :ets.insert(:errors, {uuid})
         async_loop(id, uuid)
       {:ibrowse_async_response_end, ^id} ->
         Logger.info "response end, #{uuid} with the process #{:erlang.pid_to_list self()} exit"
-        # async_loop(id)
+        :ets.insert(:errors, {uuid})
     end
+  end
+
+  def handle_info(_msg, state) do
+    {:noreply, state}
   end
 
 end

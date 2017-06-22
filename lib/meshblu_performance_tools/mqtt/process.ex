@@ -7,15 +7,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   end
 
   def sub(pid, topic \\ "message", qos \\ 0) do
-    GenMQTT.subscribe(pid, "8bdec525-f2d0-49cf-a948-b2819d837f19", qos)
-    # loop(pid)
-  end
-
-
-  def loop(pid) do
-    receive do
-      _ -> loop(pid)
-    end
+    GenMQTT.subscribe(pid, topic, qos)
   end
 
   def pub(pid, topic \\ "message", message \\ Poison.encode!(%{topic: "message", devices: ["47706d7d-a6db-4edd-b7a1-f7aebc5bef4e"], payload: "helo owlrd"}) , qos \\ 0, retrain \\ false) do
@@ -35,18 +27,21 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_publish(topic, message, state) do
     Logger.info "#{:erlang.pid_to_list(self())} received"
+    :ets.insert(:messages, {:erlang.pid_to_list(self())})
     send state, {:published, self, topic, message}
     {:ok, state}
   end
 
   def on_subscribe(subscription, state) do
     Logger.info "#{:erlang.pid_to_list(self())} subscribed"
+    :ets.insert(:success, {:erlang.pid_to_list(self())})
     send state, {:subscribed, subscription}
     {:ok, state}
   end
 
   def terminate(var, state) do
-    Logger.error "#{var} #{:erlang.pid_to_list(self())} terminated"
+    Logger.error "#{var} #{:erlang.pid_to_list(self())} terminated #{state}"
+    :ets.insert(:errors, {:erlang.pid_to_list(self())})
     send state, :shutdown
     :ok
   end
@@ -59,6 +54,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def terminate(_reason, _state) do
     Logger.error "#{:erlang.pid_to_list(self())} terminated"
+    :ets.insert(:errors, {:erlang.pid_to_list(self())})
     :ok
   end
 

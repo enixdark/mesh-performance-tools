@@ -42,8 +42,10 @@ defmodule MeshbluPerformanceTools.Mixfile do
       {:logger_file_backend, "~> 0.0.9"},
       {:gen_mqtt, "~> 0.3.1"},
       {:nimble_csv, "~> 0.1.0"},
-      {:yamerl, "~> 0.4.0"}
-
+      {:yamerl, "~> 0.4.0"},
+      # {:amnesia, "~> 0.2.7"}
+      # {:ecto, "~> 2.1.4"},
+      # {:ecto_mnesia, "~> 0.9.0"}
     ]
   end
 end
