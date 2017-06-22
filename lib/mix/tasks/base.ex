@@ -199,12 +199,11 @@ defmodule Mix.Tasks.Base do
       end
 
       def report do
-        :ok
-        # success_size = :success |> :ets.tab2list |> Enum.count 
-        # error_size = :errors |> :ets.tab2list |> Enum.count
-        # messages_size = :messages |> :ets.tab2list |> Enum.count
-        # :ets.delete_all_objects :messages
-        # Logger.info "success/errors/connecting/messages: #{success_size}/#{error_size}/#{success_size - error_size}/#{messages_size}"
+        success_size = :success |> :ets.tab2list |> Enum.count 
+        error_size = :errors |> :ets.tab2list |> Enum.count
+        messages_size = :messages |> :ets.tab2list |> Enum.count
+        :ets.delete_all_objects :messages
+        Logger.info "success/errors/connecting/messages: #{success_size}/#{error_size}/#{success_size - error_size}/#{messages_size}"
       end
 
       defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
