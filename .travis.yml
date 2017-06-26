@@ -1,6 +1,15 @@
-language: elixir
+env:
+  DOCKER_COMPOSE_VERSION: 1.12.0
+
+sudo: required
 
 os: linux
+
+services:
+  - docker 
+
+language: elixir
+
 elixir:
   - 1.4.4
 otp_release: 19.1
@@ -9,12 +18,23 @@ matrix:
   include:
     - elixir: 1.4.4
       otp_release: 19.1
-    - elixir: 1.4.4
-      otp_release: 20.0
     - elixir: 1.4.5
       opt_release: 19.1
     - elixir: 1.4.5
       opt_release: 20.0
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y
+  - docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose pull
+  - docker-compose build
+  - docker-compose start
+  - docker ps
+  # - docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto
 
 script:
   - MIX_ENV=test mix espec

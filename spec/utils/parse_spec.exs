@@ -1,7 +1,6 @@
 defmodule ParserSpec do
   use ESpec
   require Logger
-  require IEx
 
 
 
@@ -53,7 +52,6 @@ defmodule ParserSpec do
   context "check result from output file after use parser" do
     it "test parse with file json" do
       {:ok, {uuid, token}} = parse(Parser, :json_parse, "temp.json")
-      IEx.pry
       expect(uuid) |> to(eq "b37b29d6-2f62-48c8-84a5-7ea5477235db") 
       expect(token) |> to(eq "259f6a54f27477ffc63342d2f1614f788bd9724a") 
     end
