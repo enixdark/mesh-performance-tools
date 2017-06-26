@@ -17,4 +17,4 @@ matrix:
       opt_release: 20.0
 
 script:
-  - mix test
+  - MIX_ENV=test mix espec
