@@ -1,0 +1,18 @@
+language: elixir
+
+os: linux
+elixir:
+  - 1.4.4
+otp_release: 19.1
+
+matrix:
+  include:
+    - elixir: 1.4.4
+      otp_release: 19.1
+    - elixir: 1.4.4
+      otp_release: 20.0
+    - elixir: 1.4.5
+      opt_release: 19.1
+    - elixir: 1.4.5
+      opt_release: 20.0
+    
