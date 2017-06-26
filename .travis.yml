@@ -4,7 +4,7 @@ env:
 sudo: required
 
 os: linux
-
+dist: trusty
 services:
   - docker 
 
@@ -24,6 +24,8 @@ matrix:
       opt_release: 20.0
 
 before_install:
+  - sudo sed -i s/us.archive.ubuntu/old-releases.ubuntu/g /etc/apt/sources.list
+  - sudo sed -i s/security.ubuntu/old-releases.ubuntu/g /etc/apt/sources.list
   - sudo apt-get update
   - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
