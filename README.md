@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/enixdark/mesh-performance-tools.svg?branch=master)](https://travis-ci.org/enixdark/mesh-performance-tools)
+
 # MeshbluPerformanceTools
 
 **TODO: This is cli tool to test a connect, subsribe, pushlish message to meshblu services, support http, mqtt protocol, websocket, coap'll support in th future**

@@ -15,4 +15,6 @@ matrix:
       opt_release: 19.1
     - elixir: 1.4.5
       opt_release: 20.0
-    
+
+script:
+  - mix test
