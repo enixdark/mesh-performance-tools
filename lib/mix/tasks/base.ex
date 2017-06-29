@@ -31,10 +31,10 @@ defmodule Mix.Tasks.Base do
 
             if data != "unique" && String.to_atom(Dict.get(opts,:mode,"")) in [:unique, :file, :db_url] && !check do
               # Table.insert(:meshblu, {:meshblu, :key, System.system_time(:second), 0, [], [], 0})
+              :ets.new(:general, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
               :ets.new(:errors, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
-              :ets.new(:success, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
               :ets.new(:messages, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
-
+              :ets.new(:total, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
               case String.to_atom(Dict.get(opts,:mode,"")) do
                 :unique -> 
                   [uuid, token] = data |> String.split ":"
@@ -199,11 +199,27 @@ defmodule Mix.Tasks.Base do
       end
 
       def report do
-        success_size = :success |> :ets.tab2list |> Enum.count 
-        error_size = :errors |> :ets.tab2list |> Enum.count
+        total_size = :total |> :ets.tab2list |> Enum.count
+        errors = :errors |> :ets.tab2list
+        error_size = errors |> Enum.count
+        timeout_size = errors |> Enum.filter(fn {uuid, status_code} -> 
+          status_code == "408"
+        end) |> Enum.count
         messages_size = :messages |> :ets.tab2list |> Enum.count
+
+
+        case :ets.tab2list(:general) do
+          [] -> :ets.insert(:general, {total_size, error_size})
+          [{total, error}] -> 
+            :ets.delete_all_objects :general
+            :ets.insert(:general, { total + total_size, error + error_size })
+        end
         :ets.delete_all_objects :messages
-        Logger.info "success/errors/connecting/messages: #{success_size}/#{error_size}/#{success_size - error_size}/#{messages_size}"
+        :ets.delete_all_objects :total
+        :ets.delete_all_objects :errors
+        [{total, error}] = :ets.tab2list(:general) 
+        Logger.info "total request: #{total} total_error: #{error} total_connecting: #{total - error} \n
+                     request: #{total_size}/s errors: #{error_size}/s success: #{if total_size >0, do: total_size - error_size, else: 0}/s messages: #{messages_size}/s timeout: #{timeout_size}/s"
       end
 
       defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]

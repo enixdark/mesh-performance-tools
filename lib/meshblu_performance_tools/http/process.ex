@@ -28,8 +28,8 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 10000, max_sessions: 10000], 
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
-          Logger.info "#{uuid} with pid #{:erlang.pid_to_list self()} subscribed"
-          :ets.insert(:success, {uuid})
+          # Logger.info "#{uuid} with pid #{:erlang.pid_to_list self()} subscribed"
+          :ets.insert(:total, {uuid})
           async_loop(id, uuid)
           {:noreply, state}
         _ ->
@@ -48,29 +48,34 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         # IO.inspect headers
         async_loop(id, uuid)
       {:ibrowse_async_headers, ^id, status_code, _headers} ->
+        cond do
+           Regex.match?(~r/^(4\d+|5\d+)/, status_code |> List.to_string ) -> 
+             :ets.insert_new(:errors, {uuid, status_code |> List.to_string})
+        end
         # IO.inspect status_code
         async_loop(id, uuid)
       {:ibrowse_async_response_timeout, ^id} ->
-        Logger.error "device with #{uuid} has timeout"
-        :ets.insert(:errors, {uuid})
+        # Logger.error "device with #{uuid} has timeout"
+        :ets.insert_new(:errors, {uuid, "403"})
         :timeout
         # async_loop(id)
       {:error, :connection_closed_no_retry} ->
-        Logger.error "device with #{uuid} connection closed"
-        :ets.insert(:errors, {uuid})
+        # Logger.error "device with #{uuid} connection closed"
+        :ets.insert_new(:errors, {uuid, "444"})
         :error
         # async_loop(id)
       {:ibrowse_async_response, ^id, data} ->
         if data != [] do
           :ets.insert(:messages, {true})
-          Logger.info "#{uuid} - #{:erlang.pid_to_list self()} received #{inspect(data)}"
+          # Logger.info "#{uuid} - #{:erlang.pid_to_list self()} received #{inspect(data)}"
         end
-        :ets.insert(:errors, {uuid})
+        :ets.insert_new(:errors, {uuid})
         async_loop(id, uuid)
       {:ibrowse_async_response_end, ^id} ->
-        Logger.info "response end, #{uuid} with the process #{:erlang.pid_to_list self()} exit"
-        :ets.insert(:errors, {uuid})
+        # Logger.info "response end, #{uuid} with the process #{:erlang.pid_to_list self()} exit"
+        :ets.insert_new(:errors, {uuid, "504"})
     end
+    # IEx.pry
   end
 
   def handle_info(_msg, state) do
