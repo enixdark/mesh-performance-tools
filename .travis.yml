@@ -41,6 +41,7 @@ before_install:
   - docker-compose up -d
   - docker ps
   - mix local.hex --force
+  - MIX_ENV=test deps.get
   - MIX_ENV=test mix compile
   # - docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto
 
