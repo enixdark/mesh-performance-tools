@@ -1,3 +1,4 @@
+
 defmodule Mix.Tasks.Base do
   
 
@@ -7,9 +8,6 @@ defmodule Mix.Tasks.Base do
       require Logger
       alias EctoMnesia.Table
       require IEx
-      def process(opts, [head|data], count, persistent_auth) do
-        "ok"
-      end
 
       defp parse_args(args) do
         parse = args 
@@ -145,9 +143,15 @@ defmodule Mix.Tasks.Base do
       end
 
       defp loop() do
+        report
+        :timer.sleep(1000)
+        loop()
+      end
+
+      defp wait() do
         receive do
           _ -> 
-            loop()
+            wait()
         end
       end
 
@@ -158,28 +162,37 @@ defmodule Mix.Tasks.Base do
       def process(opts, [head|data], count, persistent_auth) do
         case opts do
           [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
+
             handle_event(head[:uuid], head[:token], opts)  
             if (rem(count, concurrency) == 0) do
-              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              # Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              # report
               :timer.sleep(delay)    
             end
-            if (count == max_connection), do: loop()
+            if (count >= max_connection) do
+               wait()
+            end
             process(opts, data, count + 1, nil)
-          [concurrency: concurrency, delay: delay, level: :once, max_connection: _, mode: _, uri: uri] -> 
-            handle_event(head[:uuid], head[:token], opts)      
+          [concurrency: concurrency, delay: delay, level: :once, max_connection: max_connection, mode: _, uri: uri] -> 
+            handle_event(head[:uuid], head[:token], opts) 
             if rem(count, concurrency) == 0 do
-              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              # report
               :timer.sleep(delay)    
             end                 
-            if (data == []), do: loop()
+            if (data == [] || count == max_connection) do
+              wait()
+            end
             process(opts, data, count + 1, nil)
           [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
             handle_event(head[:uuid], head[:token], opts) 
             if rem(count, concurrency) == 0 do
-              Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
+              # report
               :timer.sleep(delay)    
             end
-            if (count == max_connection), do: loop()
+            if (count >= max_connection) do 
+              Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
+              wait()
+            end
             cond do
               data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)
               true -> process(opts, data, count + 1, persistent_auth)
@@ -217,7 +230,8 @@ defmodule Mix.Tasks.Base do
         :ets.delete_all_objects :total
         :ets.delete_all_objects :errors
         [{total, error}] = :ets.tab2list(:general) 
-        Logger.info Poison.encode! %{total_request: total, total_error: error, total_connecting: total - error, request: total_size, error: error_size, success: if total_size >0, do: total_size - error_size, else: 0, messages: messages_size, timeout: timeout_size}
+        Logger.info Poison.encode! %{total_request: total, total_error: error, total_connecting: total - error, 
+        request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: timeout_size}
       end
 
       defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
