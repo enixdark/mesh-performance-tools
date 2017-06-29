@@ -24,6 +24,7 @@
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], [], "hexpm"},
   "mime": {:hex, :mime, "1.1.0", "01c1d6f4083d8aa5c7b8c246ade95139620ef8effb009edde934e0ec3b28090a", [:mix], [], "hexpm"},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], [], "hexpm"},
+  "mock": {:hex, :mock, "0.2.1", "bfdba786903e77f9c18772dee472d020ceb8ef000783e737725a4c8f54ad28ec", [:mix], [{:meck, "~> 0.8.2", [hex: :meck, repo: "hexpm", optional: false]}], "hexpm"},
   "mqtt": {:hex, :mqtt, "0.2.1", "17268103efec951eade0176fe9b642aa050e4a439c9c64a870d21bc0fede2fd3", [:mix, :rebar3], [], "hexpm"},
   "nimble_csv": {:hex, :nimble_csv, "0.1.1", "15b20120cba14f25c33a85a2ae41413e4aa9d2f6cf24b09e9befb9fc2a8a8013", [:mix], [], "hexpm"},
   "parallel_stream": {:hex, :parallel_stream, "1.0.5", "4c78d3e675f9eff885cbe252c89a8fc1d2fb803c0d03a914281e587834e09431", [:mix], [], "hexpm"},

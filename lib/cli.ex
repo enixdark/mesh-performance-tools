@@ -1,5 +1,3 @@
-require IEx;
-
 defmodule Cli do
   require Logger
 
