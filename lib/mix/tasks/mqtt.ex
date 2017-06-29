@@ -1,6 +1,3 @@
-
-require IEx;
-
 defmodule Mix.Tasks.Mqtt do
   use Mix.Task
   use Mix.Tasks.Base

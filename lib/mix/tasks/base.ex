@@ -1,5 +1,3 @@
-require IEx;
-
 defmodule Mix.Tasks.Base do
   
 
@@ -35,6 +33,7 @@ defmodule Mix.Tasks.Base do
               :ets.new(:errors, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
               :ets.new(:messages, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
               :ets.new(:total, [:set, :public, {:write_concurrency, true}, {:read_concurrency, true}, :named_table])
+              spawn fn -> loop end
               case String.to_atom(Dict.get(opts,:mode,"")) do
                 :unique -> 
                   [uuid, token] = data |> String.split ":"
@@ -218,8 +217,7 @@ defmodule Mix.Tasks.Base do
         :ets.delete_all_objects :total
         :ets.delete_all_objects :errors
         [{total, error}] = :ets.tab2list(:general) 
-        Logger.info "total request: #{total} total_error: #{error} total_connecting: #{total - error} \n
-                     request: #{total_size}/s errors: #{error_size}/s success: #{if total_size >0, do: total_size - error_size, else: 0}/s messages: #{messages_size}/s timeout: #{timeout_size}/s"
+        Logger.info Poison.encode! %{total_request: total, total_error: error, total_connecting: total - error, request: "#{total_size}/s", errors: "#{error_size}/s", success: "#{if total_size >0, do: total_size - error_size, else: 0}/s", messages: "#{messages_size}/s", timeout: "#{timeout_size}/s"}
       end
 
       defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]

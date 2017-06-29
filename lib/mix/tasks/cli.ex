@@ -1,4 +1,3 @@
-require IEx;
 defmodule Mix.Tasks.Cli do
   use Mix.Task
   require Logger

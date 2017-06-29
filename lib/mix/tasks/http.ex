@@ -1,5 +1,3 @@
-require IEx;
-
 defmodule Mix.Tasks.Http do
   use Mix.Task
   use Mix.Tasks.Base
@@ -25,32 +23,32 @@ defmodule Mix.Tasks.Http do
         handle_event(head[:uuid], head[:token], opts)  
         if (rem(count, concurrency) == 0) do
           # Logger.info "### delay time at: <<#{System.system_time(:second)}>>"
-          report
+          # report
           :timer.sleep(delay)    
         end
         if (count >= max_connection) do
-           loop()
+          #  loop()
         end
         process(opts, data, count + 1, nil)
       [concurrency: concurrency, delay: delay, level: :once, max_connection: max_connection, mode: _, uri: uri] -> 
         handle_event(head[:uuid], head[:token], opts) 
         if rem(count, concurrency) == 0 do
-          report
+          # report
           :timer.sleep(delay)    
         end                 
         if (data == [] || count == max_connection) do
-          loop()
+          # loop()
         end
         process(opts, data, count + 1, nil)
       [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
         handle_event(head[:uuid], head[:token], opts) 
         if rem(count, concurrency) == 0 do
-          report
+          # report
           :timer.sleep(delay)    
         end
         if (count >= max_connection) do 
           Logger.info "complete all request at: <<#{System.system_time(:second)}>>"
-          loop()
+          # loop()
         end
         cond do
           data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)

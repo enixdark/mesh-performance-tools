@@ -2,7 +2,6 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   use GenServer
   # require Timex
   require Logger
-  require IEx
   alias EctoMnesia.Table
 
   def start_link(args) do
@@ -75,7 +74,6 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         # Logger.info "response end, #{uuid} with the process #{:erlang.pid_to_list self()} exit"
         :ets.insert_new(:errors, {uuid, "504"})
     end
-    # IEx.pry
   end
 
   def handle_info(_msg, state) do

@@ -45,7 +45,7 @@ defmodule ParserSpec do
     [ %{
       "uuid": uuid,
       "token": token
-    } | tail ] = data |> Enum.to_list 
+    } | _ ] = data |> Enum.to_list 
     {:ok, {uuid, token}}
   end
 
