@@ -1,0 +1,15 @@
+user: vagrant
+data_file: /home/cqshinn/GIT/meshblu_project/meshblu_performance_tools/samples/files/devices.json
+dest_file: /tmp
+mode: file
+user: vagrant
+group: vagrant
+protocol: http
+host: 192.168.105.95
+concurrency: 10
+total: 10
+pip_download_dest: /tmp
+pip_version:
+python: python
+pip: pip
+pip_proxy: ''

@@ -1,0 +1,43 @@
+# - name: "update and upgrade ubuntu"
+#   apt: update_cache=yes cache_valid_time=3600
+#   tags:
+#     - update
+# - name: update and install erlang packages
+#   apt: name={{ item }} state=installed update_cache=yes
+#   with_items:
+#     - erlang-dev
+#     - erlang-tools
+#     - build-essential 
+#     - m4 
+#     - libncurses5-dev 
+#     - libssh-dev 
+#     - unixodbc-dev 
+#     - libgmp3-dev 
+#     - libwxgtk2.8-dev 
+#     - libglu1-mesa-dev 
+#     - fop 
+#     - xsltproc 
+#     - default-jdk
+#     - libxml2-utils
+#     - libxml2
+#   tags:
+#     - install
+# - name: Download kerl for erlang
+#   get_url:
+#     url: https://raw.githubusercontent.com/kerl/kerl/master/kerl
+#     dest: /usr/local/bin
+#     mode: 0755
+#   become: true
+# - name: change usermod kerl
+#   command: chmod +x /usr/local/bin/kerl
+#   become: true
+
+- name: Build Erlang version
+  command: kerl build {{ otp_version }} {{ otp_version }}
+  become: true
+- name: Install Erlang version
+  command: kerl install {{ otp_version }} /opt/{{ otp_version }}
+- name: Active erlang version
+  command: . /opt/{{ otp_version }}/active
+# - name: install all package through mix
+#   command: mix deps.get

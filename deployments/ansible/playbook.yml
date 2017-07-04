@@ -7,11 +7,36 @@
 #     - redis
 #   become: yes
 
-- hosts: mongo
-  strategy: debug
-  gather_facts: no
+# - hosts: mongo
+#   # strategy: debug
+#   # gather_facts: no
+#   vars_files:
+#     - ./environments/development/mongo.yml
+#   roles:
+#     - mongo
+#   become: yes
+
+# - hosts: mongo
+#   # strategy: debug
+#   # gather_facts: no
+#   vars_files:
+#     - ./environments/development/mongo.yml
+#   roles:
+#     - mongo
+#   become: yes
+
+# - hosts: cli
+#   vars_files:
+#     - ./environments/development/cli.yml
+#   roles:
+#     - cli
+#   become: yes
+#   environment:
+#     ERL_TOP: ~/.kerl/builds/{{ otp_version }}/otp_src_{{ otp_version }}
+
+- hosts: docker_cli
   vars_files:
-    - ./environments/development/mongo.yml
+    - ./environments/development/docker_cli.yml
   roles:
-    - mongo
+    - docker_cli
   become: yes
