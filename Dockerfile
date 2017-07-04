@@ -6,7 +6,8 @@ WORKDIR /opt/tools
 COPY . /opt/tools
 RUN mix local.hex --force
 RUN mix deps.get
-RUN mix escript.build
+RUN mix compile
+# RUN mix escript.build
 CMD ["mix"]
 
 # FROM node
