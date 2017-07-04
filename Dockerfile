@@ -8,7 +8,7 @@ COPY . /opt/tools
 
 RUN wget https://github.com/erlang/rebar3/releases/download/3.4.1/rebar3
 RUN chmod +x rebar3
-RUN mv rabar3 /usr/local/bin
+RUN mv rebar3 /usr/local/bin
 RUN mix local.hex --force
 RUN mix deps.get
 RUN mix compile
