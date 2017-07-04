@@ -32,6 +32,8 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
           async_loop(id, uuid)
           {:noreply, state}
         _ ->
+          :ets.insert(:total, {uuid})
+          :ets.insert_new(:errors, {uuid, '000'})
           {:noreply, state}
     end
   end
