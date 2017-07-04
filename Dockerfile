@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN mkdir /opt/tools
 WORKDIR /opt/tools
 COPY . /opt/tools
+RUN mix local.rebar --force
 RUN mix local.hex --force
 RUN mix deps.get
 RUN mix compile
