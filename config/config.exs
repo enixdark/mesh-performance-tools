@@ -53,7 +53,17 @@ config :meshblu_performance_tools, :mqtt_uri, System.get_env("MQTT_URI") || "htt
 
 config :meshblu_performance_tools, :concurrency, System.get_env("CONCURRENCY") || 1
 config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONNECTION") || 1
-config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 5_000
+config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 1_000
 config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 5_000_000
 
+
+# config :ecto_mnesia,
+#   host: {:system, :atom, "MNESIA_HOST", Kernel.node()},
+#   storage_type: {:system, :atom, "MNESIA_STORAGE_TYPE", :ram_copies}
+
+# config :mnesia,
+#   dir: 'priv/data/mnesia' # Make sure this directory exists
+
+# config :meshblu_performance_tools, :ecto_repos, [MeshbluPerformanceTools.Repo]
+# config :meshblu_performance_tools, MeshbluPerformanceTools.Repo, adapter: EctoMnesia.Adapter
 

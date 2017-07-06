@@ -7,6 +7,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   end
 
   def sub(pid, topic \\ "message", qos \\ 0) do
+    :ets.insert(:total, {:erlang.pid_to_list(self())})
     GenMQTT.subscribe(pid, topic, qos)
   end
 
@@ -15,7 +16,9 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   end
 
   def on_connect(state) do
-    # Logger.info "#{:io.list_to_pid(self())} connected"
+    if System.get_env("MESH_DEBUG") do
+      Logger.info "#{:erlang.pid_to_list(self())} connected"
+    end
     send state, :connected
     {:ok, state}
   end
@@ -26,21 +29,26 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   # end
 
   def on_publish(topic, message, state) do
-    Logger.info "#{:erlang.pid_to_list(self())} received"
+    if System.get_env("MESH_DEBUG") do
+      Logger.info "#{:erlang.pid_to_list(self())} received"
+    end
     :ets.insert(:messages, {:erlang.pid_to_list(self())})
     send state, {:published, self, topic, message}
     {:ok, state}
   end
 
   def on_subscribe(subscription, state) do
-    Logger.info "#{:erlang.pid_to_list(self())} subscribed"
-    :ets.insert(:total, {:erlang.pid_to_list(self())})
+    if System.get_env("MESH_DEBUG") do
+      Logger.info "#{:erlang.pid_to_list(self())} subscribed"
+    end
     send state, {:subscribed, subscription}
     {:ok, state}
   end
 
   def terminate(var, state) do
-    Logger.error "#{var} #{:erlang.pid_to_list(self())} terminated #{state}"
+    if System.get_env("MESH_DEBUG") do
+      Logger.error "#{var} #{:erlang.pid_to_list(self())} terminated #{state}"
+    end
     :ets.insert(:errors, {:erlang.pid_to_list(self())})
     send state, :shutdown
     :ok
@@ -53,7 +61,9 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   # end
 
   def terminate(_reason, _state) do
-    Logger.error "#{:erlang.pid_to_list(self())} terminated"
+    if System.get_env("MESH_DEBUG") do
+      Logger.error "#{:erlang.pid_to_list(self())} terminated"
+    end
     :ets.insert(:errors, {:erlang.pid_to_list(self())})
     :ok
   end
