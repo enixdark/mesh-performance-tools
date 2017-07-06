@@ -27,7 +27,8 @@ def register_with_custom_server(uri, body):
     try:
         response = requests.post(uri + "/ADServer/devices/register", 
                              headers = {'content-type': 'application/json'}, 
-                             data = json.dumps(body), verify=False, timeout=5)
+                             data = json.dumps(body), verify=True, timeout=10)
+
         logger.info(response.content)
     except requests.RequestException as error:
         logger.error(json.dumps({'error': str(error.message)}))
@@ -58,7 +59,7 @@ if __name__ == '__main__':
         help="total of requests", default=1)
     parser.add_option(
         "-l", "--logpath", dest="logpath",
-        help="path to save a logfile", default='../logs/devices.log')
+        help="path to save a logfile", default='devices.log')
     (options, args) = parser.parse_args(sys.argv)
 
     logging.basicConfig(level=logging.INFO)
@@ -80,15 +81,17 @@ if __name__ == '__main__':
     uri_cleaned = protocol + "://" + host + ":" + str(port)
     if options.body:
         if os.path.isfile(options.body):
-            data = json.loads(options.body)['devices']            
-            for i in xrange(len(data)):
-                if count == concurrency:
-                    count = 0
-                    time.sleep(delay)
-                threads.append(gevent.spawn(register_with_custom_server, uri_cleaned, data[i]))
-                count = count + 1
-            gevent.joinall(threads)
-
+            with open(options.body) as f:
+                data = json.loads(f.read())['devices']    
+                for i in xrange(len(data[0:])):
+                    if count == concurrency:
+                        count = 0
+                        time.sleep(delay)
+                    # import ipdb;ipdb.set_trace()
+                    # register_with_custom_server(uri_cleaned, data[i+0])
+                    threads.append(gevent.spawn(register_with_custom_server, uri_cleaned, data[i + 34809]))
+                    count = count + 1
+                gevent.joinall(threads)
         else:
             body = reduce(lambda x,y: dict(x, **{y[0]: y[1]}), 
                       map(lambda x: re.split(r'=(.+)',x)[0:2], options.body.split(";")), {}
