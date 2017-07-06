@@ -13,5 +13,4 @@ defmodule Mix.Tasks.Http do
     {:ok, pid} = MeshbluPerformanceTools.HTTP.Register.start_link([])
     MeshbluPerformanceTools.HTTP.Register.subscriber(pid, options[:uri], uuid, token)
   end
-
 end

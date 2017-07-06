@@ -1,6 +1,7 @@
 defmodule MeshbluPerformanceTools.HTTP.Register do
   use GenServer
   require Logger
+  require IEx
   def start_link(args) do
     # Logger.info "start register...................."
     GenServer.start_link(__MODULE__, args, [])

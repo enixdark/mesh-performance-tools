@@ -3,7 +3,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   # require Timex
   require Logger
   alias EctoMnesia.Table
-
+  require IEx
   def start_link(args) do
     GenServer.start_link(__MODULE__,args, [])
   end
@@ -23,7 +23,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   def handle_cast({:subscribe, uuid, token}, state) do
     :ibrowse.set_max_sessions("http://#{state[:host]}", state[:port], 10000)
     {:ok, worker_pid} = HTTPotion.spawn_worker_process("http://#{state[:host]}:#{state[:port]}/subscribe")
-     case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token],
+    case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token],
         ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 10000, max_sessions: 10000], 
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
@@ -31,7 +31,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
           :ets.insert(:total, {uuid})
           async_loop(id, uuid)
           {:noreply, state}
-        _ ->
+        error ->
           :ets.insert(:total, {uuid})
           :ets.insert_new(:errors, {uuid, '000'})
           {:noreply, state}

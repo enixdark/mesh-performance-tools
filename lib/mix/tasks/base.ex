@@ -69,9 +69,11 @@ defmodule Mix.Tasks.Base do
           :mqtt ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :mqtt_uri))
           _ ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
         end
-        host = uri.host
-        port = Dict.get(opts,:port, nil)  || uri.port
-        protocol = Dict.get(opts,:protocol, nil)  || uri.scheme
+        load_config =  URI.parse(Application.get_env(:meshblu_performance_tools, :uri))
+        host = uri.host || uri.path || load_config.host
+        port = Dict.get(opts,:port, nil)  || uri.port || load_config.port
+        protocol = Dict.get(opts,:protocol, nil)  || uri.scheme || load_config.scheme
+       
         process(Keyword.merge([concurrency: Dict.get(opts,:concurrency, nil) || Application.get_env(:meshblu_performance_tools, :concurrency), 
                                             max_connection: Dict.get(opts,:max_connection, nil)  || Application.get_env(:meshblu_performance_tools, :max_connection), 
                                             delay: Dict.get(opts,:delay, nil) || Application.get_env(:meshblu_performance_tools, :delay), 
