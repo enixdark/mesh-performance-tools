@@ -6,7 +6,6 @@ defmodule Mix.Tasks.Http do
   @shortdoc "return http"
   def title do
     :http
-    
   end
 
   def handle_event(uuid, token, options) do

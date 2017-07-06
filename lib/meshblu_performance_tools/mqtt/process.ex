@@ -3,7 +3,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   require Logger
   require IEx
   def start_link(opts \\ []) do
-    GenMQTT.start_link(__MODULE__, self(), opts)
+    GenMQTT.start_link(MeshbluPerformanceTools.MQTT.Process, self(), opts)
   end
 
   def sub(pid, topic \\ "message", qos \\ 0) do
@@ -34,7 +34,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_subscribe(subscription, state) do
     Logger.info "#{:erlang.pid_to_list(self())} subscribed"
-    :ets.insert(:success, {:erlang.pid_to_list(self())})
+    :ets.insert(:total, {:erlang.pid_to_list(self())})
     send state, {:subscribed, subscription}
     {:ok, state}
   end
@@ -59,7 +59,6 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   end
 
   # def handle_info(msg, state) do
-  #   IEx.pry
   #   {:noreply, state}
   # end
   

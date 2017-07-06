@@ -65,11 +65,17 @@ defmodule Mix.Tasks.Base do
           true -> :multi
           _ -> :once    
         end
+        load_config = nil
         uri = case title do
-          :mqtt ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :mqtt_uri))
-          _ ->  URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
+          :mqtt ->  
+            load_config =  URI.parse(Application.get_env(:meshblu_performance_tools, :mqtt_uri))
+            URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :mqtt_uri))
+          _ ->  
+            load_config = URI.parse(Application.get_env(:meshblu_performance_tools, :uri))
+            URI.parse(Dict.get(opts,:host, nil) || Application.get_env(:meshblu_performance_tools, :uri))
         end
-        load_config =  URI.parse(Application.get_env(:meshblu_performance_tools, :uri))
+        
+        
         host = uri.host || uri.path || load_config.host
         port = Dict.get(opts,:port, nil)  || uri.port || load_config.port
         protocol = Dict.get(opts,:protocol, nil)  || uri.scheme || load_config.scheme

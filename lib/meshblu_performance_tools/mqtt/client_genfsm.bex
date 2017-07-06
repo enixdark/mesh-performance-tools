@@ -1,0 +1,36 @@
+defmodule MeshbluPerformanceTools.MQTT.ClientFSM do
+  use GenFSM
+
+  require Logger
+  require IEx
+
+  def start_link(args \\ [host: "localhost", port: 1883, uuid: "47706d7d-a6db-4edd-b7a1-f7aebc5bef4e", token: "e6869b631aa3d521a842752f8ed7300d62fa9332"]) do
+    Logger.info "start mqtt...................."
+    # GenStateMachine.start_link(__MODULE__, {:event, args})
+    GenFSM.start_link(__MODULE__, args, [])
+  end
+
+  def init(args), do: {:ok, :event, args}
+
+  def next(pid) do
+    GenFSM.sync_send_event(pid, :process)
+  end
+
+  def event(:process, _from, state) do
+    {:ok, pid } = MeshbluPerformanceTools.MQTT.Process.start_link([host: state[:host], port: state[:port], username: state[:uuid], password: state[:token]])
+    {:reply, :subscribe, :subscribe, state ++ [pid: pid]}
+  end
+
+  def subscribe(:process, _from, state) do
+    pid = state[:pid]
+    MeshbluPerformanceTools.MQTT.Process.sub(pid, "47706d7d-a6db-4edd-b7a1-f7aebc5bef4e", 0)
+    {:reply, :ok, :ok, state}
+  end
+
+
+  def ok(:process, _from, state) do
+    {:reply, :ok, :ok, state}
+  end 
+
+  
+end

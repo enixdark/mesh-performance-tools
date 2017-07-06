@@ -1,9 +1,8 @@
 defmodule Mix.Tasks.Mqtt do
   use Mix.Task
   use Mix.Tasks.Base
-
   @shortdoc "return mqtt"
-
+  require IEx
   def title do
     :mqtt
   end
@@ -12,6 +11,8 @@ defmodule Mix.Tasks.Mqtt do
     {:ok, pid} =  MeshbluPerformanceTools.MQTT.Client.start_link
     MeshbluPerformanceTools.MQTT.Client.subscriber(pid, options[:uri], uuid, token)     
   end
+
+  
 
 
 end
