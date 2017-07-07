@@ -40,6 +40,10 @@ before_install:
   - docker-compose build
   - docker-compose up -d
   - docker ps
+  - wget https://github.com/erlang/rebar3/releases/download/3.4.1/rebar3
+  - chmod +x rebar3
+  - rebar3 /usr/local/bin
+  - mix local.rebar --force
   - mix local.hex --force
   - MIX_ENV=test mix deps.get
   - MIX_ENV=test mix compile
