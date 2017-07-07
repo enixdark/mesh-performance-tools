@@ -4,15 +4,18 @@ env:
 sudo: required
 
 os: linux
+sudo: required
 dist: trusty
 services:
   - docker 
 
+group: deprecated-2017Q2
 language: elixir
 
 elixir:
   - 1.4.4
 otp_release: 19.1
+
 
 matrix:
   include:
@@ -42,7 +45,7 @@ before_install:
   - docker ps
   - wget https://github.com/erlang/rebar3/releases/download/3.4.1/rebar3
   - chmod +x rebar3
-  - mv rebar3 /usr/local/bin
+  # - mv rebar3 /usr/local/bin
   - mix local.rebar --force
   - mix local.hex --force
   - MIX_ENV=test mix deps.get
