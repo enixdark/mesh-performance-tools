@@ -49,7 +49,7 @@ defmodule Mix.Tasks.Cli do
         -n, --max_connection        Max number of total requests. Default: 10
         -d, --delay        Delay time for every request. Default: 1
         -m, --mode   mode to use for auth devices, include single, file, database 
-        -h, --host   request to hostname of meshblu service . Default: localhost
+        -H, --host   request to hostname of meshblu service . Default: localhost
         -p, --port   request to port of meshblu service . Default: 3000 for http, 1883 for mqtt
         -P, --protocol   protocol of meshblu service . Default: http
         -f, --force  use for mode, to force a request indepent

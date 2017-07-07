@@ -12,43 +12,29 @@ defmodule Mix.Tasks.Mqtt do
     MeshbluPerformanceTools.MQTT.Client.subscriber(pid, options[:uri], uuid, token)     
   end
 
-  def process(opts, [head|data], count, persistent_auth) do
-    case opts do
-      [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
+  def report do
+    total_size = :total |> :ets.tab2list |> Enum.count
+    errors = :errors |> :ets.tab2list
+    error_size = errors |> Enum.count
+    # timeout_size = errors |> Enum.filter(fn {uuid, status_code} -> 
+    #   status_code == "408"
+    # end) |> Enum.count
+    messages_size = :messages |> :ets.tab2list |> Enum.count
 
-        handle_event(head[:uuid], head[:token], opts)  
-        if (rem(count, concurrency) == 0) do
-          :timer.sleep(delay)    
-        end
-        if (count >= max_connection) do
-            wait()
-        end
-        process(opts, data, count + 1, nil)
-      [concurrency: concurrency, delay: delay, level: :once, max_connection: max_connection, mode: _, uri: uri] -> 
-        handle_event(head[:uuid], head[:token], opts) 
-        if rem(count, concurrency) == 0 do
-          :timer.sleep(delay)    
-        end                 
-        if (data == [] || count == max_connection) do
-          wait()
-        end
-        process(opts, data, count + 1, nil)
-      [concurrency: concurrency, delay: delay, force: _, level: :multi, max_connection: max_connection, mode: _, uri: uri] -> 
-        handle_event(head[:uuid], head[:token], opts) 
-        if rem(count, concurrency) == 0 do
-          :timer.sleep(delay)    
-        end
-        if (count >= max_connection) do 
-          wait()
-        end
-        cond do
-          data == [] -> process(opts, persistent_auth, count + 1, persistent_auth)
-          true -> process(opts, data, count + 1, persistent_auth)
-        end
-      _ ->
-        :ok
+    case :ets.tab2list(:general) do
+      [] -> :ets.insert(:general, {total_size, error_size})
+      [{total, error}] -> 
+        :ets.delete_all_objects :general
+        :ets.insert(:general, { total + total_size, error + error_size })
     end
+    :ets.delete_all_objects :messages
+    :ets.delete_all_objects :total
+    :ets.delete_all_objects :errors
+    [{total, error}] = :ets.tab2list(:general) 
+    Logger.info Poison.encode! %{total_request: total, total_error: error, total_connecting: total - error, 
+    request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: 0}
   end
+
 
 end
 

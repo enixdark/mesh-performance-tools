@@ -136,7 +136,7 @@ defmodule Mix.Tasks.Base do
             -n, --max_connection        Max number of total requests. Default: 10
             -d, --delay        Delay time for every request. Default: 1
             -m, --mode   mode to use for auth devices, include single, file, database 
-            -h, --host   request to hostname of meshblu service . Default: localhost
+            -H, --host   request to hostname of meshblu service . Default: localhost
             -p, --port   request to port of meshblu service . Default: 3000 for http, 1883 for mqtt
             -P, --protocol   protocol of meshblu service . Default: http
             -f, --force  use for mode, to force a request indepent
@@ -152,7 +152,7 @@ defmodule Mix.Tasks.Base do
 
       defp loop() do
         report
-        :timer.sleep(1000)
+        :timer.sleep(1500)
         loop()
       end
 
@@ -222,9 +222,9 @@ defmodule Mix.Tasks.Base do
         total_size = :total |> :ets.tab2list |> Enum.count
         errors = :errors |> :ets.tab2list
         error_size = errors |> Enum.count
-        timeout_size = errors |> Enum.filter(fn {uuid, status_code} -> 
-          status_code == "408"
-        end) |> Enum.count
+        # timeout_size = errors |> Enum.filter(fn {uuid, status_code} -> 
+        #   status_code == "408"
+        # end) |> Enum.count
         messages_size = :messages |> :ets.tab2list |> Enum.count
 
 
@@ -239,7 +239,7 @@ defmodule Mix.Tasks.Base do
         :ets.delete_all_objects :errors
         [{total, error}] = :ets.tab2list(:general) 
         Logger.info Poison.encode! %{total_request: total, total_error: error, total_connecting: total - error, 
-        request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: timeout_size}
+        request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: 0}
       end
 
       defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]

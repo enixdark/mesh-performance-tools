@@ -7,7 +7,6 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   end
 
   def sub(pid, topic \\ "message", qos \\ 0) do
-    :ets.insert(:total, {:erlang.pid_to_list(self())})
     GenMQTT.subscribe(pid, topic, qos)
   end
 
@@ -19,6 +18,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
     if System.get_env("MESH_DEBUG") do
       Logger.info "#{:erlang.pid_to_list(self())} connected"
     end
+    :ets.insert(:total, {:erlang.pid_to_list(self())})
     send state, :connected
     {:ok, state}
   end
@@ -30,7 +30,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_publish(topic, message, state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info "#{:erlang.pid_to_list(self())} received"
+      Logger.info "#{:erlang.pid_to_list(self())} #{inspect(message)} received"
     end
     :ets.insert(:messages, {:erlang.pid_to_list(self())})
     send state, {:published, self, topic, message}
@@ -40,6 +40,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   def on_subscribe(subscription, state) do
     if System.get_env("MESH_DEBUG") do
       Logger.info "#{:erlang.pid_to_list(self())} subscribed"
+      Logger.info inspect(subscription)
     end
     send state, {:subscribed, subscription}
     {:ok, state}
