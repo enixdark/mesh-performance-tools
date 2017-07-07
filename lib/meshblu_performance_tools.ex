@@ -8,12 +8,9 @@ defmodule MeshbluPerformanceTools do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
     Logger.info "Start a new app at: #{System.system_time(:second)}"
-    :ibrowse.set_max_sessions("http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com", 3000, 10000)
-    :ibrowse.set_max_sessions("http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com", 3001, 10000)
-    :ibrowse.set_max_pipeline_size("http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com", 3000, 10000)
-    :ibrowse.set_max_pipeline_size("http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com", 3001, 10000)
-
+    
     children = [
+      # supervisor(MeshbluPerformanceTools.Repo, [])
         # Define workers and child supervisors to be supervised
         #  :hackney_pool.child_spec(:first_pool,  [timeout: Application.get_env(:meshblu_performance_tools, :timeout), 
         #                                         max_connections: Application.get_env(:meshblu_performance_tools, :max_connection)]),
