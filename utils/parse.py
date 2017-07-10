@@ -42,11 +42,11 @@ def main(argv=None):
     #     line = p | 'ReadMyFile' >> beam.io.ReadFromText('../logs/devices.log') \
     #              | beam.ParDo(ProcessBeamFn()) \
     #              | beam.io.WriteToText('../samples/files/rdevices.json')
-    with open('../logs/devices.log') as f:
+    with open('./devices.log') as f:
         data = []
         for line in f.readlines():
-            parse = json.loads(line)
             try:
+                parse = json.loads(line)
                 data.append({
                     "uuid": parse["uuid"],
                     "token": parse["token"],

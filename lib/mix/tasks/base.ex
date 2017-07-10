@@ -12,14 +12,14 @@ defmodule Mix.Tasks.Base do
       defp parse_args(args) do
         parse = args 
         |> OptionParser.parse(
-          switches: [force: :boolean, mode: :string, logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
-          aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, H: :host, p: :port, P: :protocol],
+          switches: [from: :integer, to: :integer, force: :boolean, mode: :string, logpath: :string , concurrency: :integer, max_connection: :integer, delay: :integer, host: :string, port: :string, protocol: :string],
+          aliases: [f: :force, m: :mode, l: :logpath , c: :concurrency, n: :max_connection, d: :delay, u: :uri, H: :host, p: :port, P: :protocol, F: :from, T: :to],
         )
         
         case parse do
           {[], _, _} -> process(:help)
           {opts, _, non_opts} -> 
-
+            
             first = args |> Enum.find_index &(Regex.match?(~r/(-m|--mode)/, &1) ) 
             data = args |> Enum.slice(first..first+2)
                         |> Enum.at(-1)
@@ -37,6 +37,9 @@ defmodule Mix.Tasks.Base do
                   [uuid, token] = data |> String.split ":"
                   opts |> process_parse([%{uuid: uuid, token: token}])
                 :file -> 
+                  unless(check_from_to?(data,  Dict.get(opts,:from, nil) || 1, Dict.get(opts,:to, nil) 
+                                                                               || Dict.get(opts,:max_connection, nil)  
+                                                                               || Application.get_env(:meshblu_performance_tools, :max_connection)), do: process(:help))
                   clean_data = case detect_format_file(data) do
                     :json -> 
                       Parser.json_parse data
@@ -61,6 +64,8 @@ defmodule Mix.Tasks.Base do
       end
 
       defp process_parse(opts, data) do
+        from = Dict.get(opts,:from, nil)
+        to = Dict.get(opts,:to, nil)
         mode = case Dict.get(opts,:force, false) do
           true -> :multi
           _ -> :once    
@@ -79,13 +84,34 @@ defmodule Mix.Tasks.Base do
         host = uri.host || uri.path || load_config.host
         port = Dict.get(opts,:port, nil)  || uri.port || load_config.port
         protocol = Dict.get(opts,:protocol, nil)  || uri.scheme || load_config.scheme
-       
+        :ibrowse.set_max_sessions("#{protocol}://#{host}", port, Application.get_env(:meshblu_performance_tools, :ibrowse_max_connection))
         process(Keyword.merge([concurrency: Dict.get(opts,:concurrency, nil) || Application.get_env(:meshblu_performance_tools, :concurrency), 
-                                            max_connection: Dict.get(opts,:max_connection, nil)  || Application.get_env(:meshblu_performance_tools, :max_connection), 
+                                            max_connection: to || Dict.get(opts,:max_connection, nil)  || Application.get_env(:meshblu_performance_tools, :max_connection), 
                                             delay: Dict.get(opts,:delay, nil) || Application.get_env(:meshblu_performance_tools, :delay), 
                                             uri: "#{protocol}://#{host}:#{port}",
                                             level: mode],
-                                            Dict.drop(opts,[:host, :port, :logpath, :prorotol]) ) |> Enum.sort, Enum.to_list(data), 1, Enum.to_list(data))
+                                            Dict.drop(opts,[:from, :to, :host, :port, :logpath, :protocol]) ) |> Enum.sort, Enum.to_list(data), 
+                                            if( String.to_atom(Dict.get(opts,:mode,"")) == :file, do: from || 1, else: 1) , 
+                                            Enum.to_list(data))
+      end
+
+      defp check_from_to?(file, from, to) do
+        {:ok, json} = File.read file
+        body = Poison.decode! json
+        count = Enum.count body["devices"]
+        cond do
+          (from != nil and to != nil) and (from > to) ->
+            IO.puts "  Can't process so start size is large than end size\n"
+            :false
+          from > count || from < 0 ->
+            IO.puts "  Can't process so start of size is out of data size\n"
+            :false
+          to > count || to < 0 -> 
+            IO.puts "  Can't process so end of size is large than data size\n"
+            :false 
+          true ->
+            :true
+        end
       end
 
   
@@ -140,6 +166,8 @@ defmodule Mix.Tasks.Base do
             -p, --port   request to port of meshblu service . Default: 3000 for http, 1883 for mqtt
             -P, --protocol   protocol of meshblu service . Default: http
             -f, --force  use for mode, to force a request indepent
+            -F, --from   position of start of data in file
+            -T, --to     position of end of data in file
             -l, --logpath      path to save log
         """
         System.halt(0)
@@ -152,7 +180,7 @@ defmodule Mix.Tasks.Base do
 
       defp loop() do
         report
-        :timer.sleep(1500)
+        :timer.sleep(150000)
         loop()
       end
 
@@ -168,6 +196,7 @@ defmodule Mix.Tasks.Base do
       end
 
       def process(opts, [head|data], count, persistent_auth) do
+        IEx.pry
         case opts do
           [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
 
@@ -242,7 +271,7 @@ defmodule Mix.Tasks.Base do
         request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: 0}
       end
 
-      defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
+      defoverridable [check_from_to?: 3, loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
     end
   end
 

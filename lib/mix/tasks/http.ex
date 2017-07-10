@@ -13,4 +13,5 @@ defmodule Mix.Tasks.Http do
     MeshbluPerformanceTools.HTTP.Register.subscriber(pid, options[:uri], uuid, token)
   end
 
+  
 end

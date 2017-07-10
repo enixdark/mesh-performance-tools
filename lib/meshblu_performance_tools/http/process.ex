@@ -23,21 +23,21 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
   event subscriber via http streaming
   """
   def handle_cast({:subscribe, uuid, token}, state) do
-    :ibrowse.set_max_sessions("http://#{state[:host]}", state[:port], 100000)
+    
     {:ok, worker_pid} = HTTPotion.spawn_worker_process("http://#{state[:host]}:#{state[:port]}/subscribe")
     case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token],
         ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 100000, max_sessions: 100000], 
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list self(}, type: :subscribe, token: token, time: :os.system_time(:millisecond)}
+            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :subscribe, token: token, time: :os.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           async_loop(id, uuid)
           {:noreply, state}
         error ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list self(}, type: :terminated, token: token, reason: error, time: :os.system_time(:millisecond)}
+            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :terminated, token: token, reason: error, time: :os.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", '000'})
@@ -59,7 +59,7 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         async_loop(id, uuid)
       {:ibrowse_async_headers, ^id, status_code, headers} ->
         if System.get_env("MESH_DEBUG") do 
-          Logger.info inspect(%{uuid: uuid, type: :error, time: :os.system_time(:millisecond), code: code, headers: headers})
+          Logger.info inspect(%{uuid: uuid, type: :error, time: :os.system_time(:millisecond), code: status_code, headers: headers})
         end
         cond do
            Regex.match?(~r/^(4\d+|5\d+)/, status_code |> List.to_string ) -> 
@@ -68,14 +68,14 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         async_loop(id, uuid)
       {:ibrowse_async_response_timeout, ^id} ->
         if System.get_env("MESH_DEBUG") do 
-          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason :timeout})
+          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason: :timeout})
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "403"})
         :timeout
         # async_loop(id)
       {:error, :connection_closed_no_retry} ->
         if System.get_env("MESH_DEBUG") do
-          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason :connection_closed})
+          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason: :connection_closed})
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "444"})
         :error
