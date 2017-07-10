@@ -56,6 +56,7 @@ config :meshblu_performance_tools, :max_connection, System.get_env("MAX_CONNECTI
 config :meshblu_performance_tools, :delay, System.get_env("DELAY") || 1_000
 config :meshblu_performance_tools, :timeout, System.get_env("TIMEOUT") || 5_000_000
 config :meshblu_performance_tools, :ibrowse_max_connection, System.get_env("IBROWSE_MAX_CONNECTION") || 1_000_000
+config :meshblu_performance_tools, :loop_time, System.get_env("LOOP_TIME") || 1_000
 
 # config :ecto_mnesia,
 #   host: {:system, :atom, "MNESIA_HOST", Kernel.node()},

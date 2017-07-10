@@ -180,7 +180,7 @@ defmodule Mix.Tasks.Base do
 
       defp loop() do
         report
-        :timer.sleep(150000)
+        :timer.sleep(Application.get_env(:meshblu_performance_tools, :loop_time))
         loop()
       end
 
@@ -196,7 +196,6 @@ defmodule Mix.Tasks.Base do
       end
 
       def process(opts, [head|data], count, persistent_auth) do
-        IEx.pry
         case opts do
           [concurrency: concurrency, delay: delay, level: _, max_connection: max_connection, mode: :unique, uri: uri] -> 
 
@@ -271,7 +270,7 @@ defmodule Mix.Tasks.Base do
         request: total_size, errors: error_size, success: (if total_size >0, do: total_size - error_size, else: 0), messages: messages_size, timeout: 0}
       end
 
-      defoverridable [check_from_to?: 3, loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
+      defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
     end
   end
 

@@ -14,12 +14,11 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
     GenMQTT.subscribe(pid, topic, qos)
   end
 
-  def pub(pid, topic \\ "message", message \\ Poison.encode!(%{topic: "message", devices: ["47706d7d-a6db-4edd-b7a1-f7aebc5bef4e"], payload: "helo owlrd"}) , qos \\ 0, retrain \\ false) do
+  def pub(pid, topic \\ "message", message \\ Poison.encode!(%{topic: "message", devices: ["47706d7d-a6db-4edd-b7a1-f7aebc5bef4e"], payload: "helo world"}) , qos \\ 0, retrain \\ false) do
     GenMQTT.publish(pid, topic, message, qos, retrain)
   end
 
   def on_connect(state) do
-    # Logger.info inspect(state)
     if System.get_env("MESH_DEBUG") do
       Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect, time: :os.system_time(:millisecond)}
     end
@@ -27,11 +26,6 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
     send self(), :connected
     {:ok, state}
   end
-
-  # def on_connect_error(reason, state) do
-  #   send state, :connected_error
-  #   {:ok, state}
-  # end
 
   def on_publish(topic, message, state) do
     if System.get_env("MESH_DEBUG") do
@@ -75,7 +69,6 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   # end
 
   # def handle_info(msg, state) do
-  #   # Logger.info Poison.encode! inspect(msg)
   #   {:noreply, state}
   # end
 
@@ -85,12 +78,15 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
     if System.get_env("MESH_DEBUG") do
       Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :disconnect, time: :os.system_time(:millisecond)}
     end
+    send state, :disconnected
+    {:ok, state}
   end
   
   def on_connect_error(reason, state) do
     if System.get_env("MESH_DEBUG") do
       Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect_error, time: :os.system_time(:millisecond), reason: reason}
     end
+    send state, :connected_error
     {:ok, state}
   end
   

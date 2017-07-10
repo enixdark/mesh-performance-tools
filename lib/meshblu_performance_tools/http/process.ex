@@ -26,18 +26,19 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     
     {:ok, worker_pid} = HTTPotion.spawn_worker_process("http://#{state[:host]}:#{state[:port]}/subscribe")
     case HTTPotion.get "http://#{state[:host]}:#{state[:port]}/subscribe", [headers: ["meshblu_auth_uuid": uuid, "meshblu_auth_token": token],
-        ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: 100000, max_sessions: 100000], 
+        ibrowse: [direct: worker_pid, stream_to: {self(), :once}, max_pipeline_size: Application.get_env(:meshblu_performance_tools, :ibrowse_max_connection), 
+                                                                  max_sessions: Application.get_env(:meshblu_performance_tools, :ibrowse_max_connection)], 
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :subscribe, token: token, time: :os.system_time(:millisecond)}
+            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :subscribe, token: token, time: :os.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           async_loop(id, uuid)
           {:noreply, state}
         error ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poinson.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :terminated, token: token, reason: error, time: :os.system_time(:millisecond)}
+            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :terminated, token: token, reason: error, time: :os.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", '000'})
