@@ -25,18 +25,18 @@
 #     - mongo
 #   become: yes
 
-# - hosts: cli
-#   vars_files:
-#     - ./environments/development/cli.yml
-#   roles:
-#     - cli
-#   become: yes
-#   environment:
-#     ERL_TOP: ~/.kerl/builds/{{ otp_version }}/otp_src_{{ otp_version }}
-
-- hosts: docker_cli
+- hosts: cli
   vars_files:
-    - ./environments/development/docker_cli.yml
+    - ./environments/development/cli.yml
   roles:
-    - docker_cli
+    - cli
   become: yes
+  environment:
+    ERL_TOP: ~/.kerl/builds/{{ otp_version }}/otp_src_{{ otp_version }}
+
+# - hosts: docker_cli
+#   vars_files:
+#     - ./environments/development/docker_cli.yml
+#   roles:
+#     - docker_cli
+#   become: yes

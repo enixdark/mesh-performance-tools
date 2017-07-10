@@ -4,3 +4,8 @@ mongodb_api_port: 28017
 mongodb_user: user
 mongodb_database: database
 mongodb_pass: password
+url_apt_key: "keyserver.ubuntu.com"
+id_apt_key: 0C49F3730359A14518585931BC711F9BA15703C6
+mongodb_repository: "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse"
+mongodb_packages:
+  - mongodb-org

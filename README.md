@@ -14,6 +14,8 @@
 
 ### How to Install app
 
+#### manual
+
 install all package for elixir app
 
 `mix deps.get`
@@ -25,6 +27,22 @@ compile to generate tasks
 generate binary file through escript
 
 `mix escript.build`
+
+#### Auto
+
+use ansible to setup app, firstly, please install ansible
+
+`apt-get install ansible`
+
+then move to app/deployments/ansible, and use command:
+
+`ansible-playbook playbook.yml`
+
+if there's a bug for permission, please run `sudo -` before run command above
+
+<hr>
+
+### Test
 
 use command to test
 
@@ -77,14 +95,19 @@ or
 
 `meshblu_performance_tools -h`
 
+<hr>
 
 ### Log & Report
+
+<hr>
 
 #### Report
 
 Currently , this version's not support report
 
 Ongoing . . .
+
+<hr>
 
 #### Log
 
@@ -104,6 +127,8 @@ config :logger, :error,
   path: "logs/error.log",
   level: :error
 ```
+
+<hr>
 
 ### Register, Subscribe, Publish and Create devices file 
 
@@ -164,6 +189,8 @@ or for custom server and body params, use:
 or to load devices from a file use:
 
 ```babel-node register.js --body path/log.json -u http://localhost:3000 -n 10```
+
+<hr>
 
 ### Parsing  sample data file
 

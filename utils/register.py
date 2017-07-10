@@ -25,7 +25,7 @@ def register_default(uri):
 # request a register with custom server of meshblu http and pass body to it
 def register_with_custom_server(uri, body):
     try:
-        response = requests.post(uri + "/ADServer/devices/register", 
+        response = requests.post(uri + "/devices", 
                              headers = {'content-type': 'application/json'}, 
                              data = json.dumps(body), verify=True, timeout=10)
 

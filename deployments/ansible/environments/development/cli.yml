@@ -1,1 +1,9 @@
 otp_version: 19.0
+erlang_repo: "http://packages.erlang-solutions.com/ubuntu"
+erlang_repo: "https://packages.erlang-solutions.com/"
+erlang_repo_key_url: "https://packages.erlang-solutions.com/{{ ansible_distribution | lower }}/erlang_solutions.asc"
+erlang_repo_components: "contrib"
+rebar3_version: 3.1.4 
+erlang_packages_state: present
+erlang_pin: true
+erlang_pin_origin: "{{ erlang_repo | regex_replace('^[a-zA-Z]+://(.*)?/$', '\\1') }}"

@@ -1,0 +1,16 @@
+
+---
+
+- name: Ubuntu | Add keys authenticity
+  apt_key:
+    keyserver: "{{ url_apt_key }}"
+    id: "{{ id_apt_key }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Ubuntu | Add source sources
+  apt_repository: repo='{{ mongodb_repository }}' update_cache=yes
+
+- name: Ubuntu | Install Packages
+  apt: pkg={{ item }} state=installed force=yes
+  with_items: 
+    - "{{ mongodb_packages }}"
