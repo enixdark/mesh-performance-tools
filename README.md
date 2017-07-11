@@ -40,6 +40,17 @@ then move to app/deployments/ansible, and use command:
 
 if there's a bug for permission, please run `sudo -` before run command above
 
+### Install distributed app with ansible
+
+- firstly, move to meshblu_performance_tools/deployments/terraform/stage/server/ansible by cd command. then, open config.py file and set variables with list server ip or domain
+- after config file, please run `python patch.py -n [number]` , number: total of number that you want request from 1 file
+- after run `python patch.py`, a file hosts'll be generate
+- finally, use `ansible-playbook playbook.yml -vvv` to setup distribute app to servers/computers
+
+- note: if server/computer's setup completely app with docker:
+  + you can use command `ansible-playbook playbook.yml -t cli` only to run apps without any setup tasks 
+  + use `ansible-playbook playbook.yml -t stop` to stop apps
+
 <hr>
 
 ### Test

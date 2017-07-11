@@ -1,0 +1,2 @@
+[server]{% for ip in list_ips %}
+{{ ip['host']|e }}{% if (ip['key'] or key) %} ansible_ssh_private_key_file={{ ip['key'] or key }} {% endif %}{% if (ip['user'] or user) %} ansible_ssh_user={{ ip['user'] or user }} {% endif %}{% if (ip['password'] or password) %} ansible_ssh_pass={{ ip['password'] or password }}{% endif %} from={{ ip['from'] }} to={{ ip['to'] }}{%endfor%} 

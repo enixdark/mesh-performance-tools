@@ -1,5 +1,6 @@
 user: vagrant
-data_file: /home/ubuntu/devices.json
+
+data_file: /home/cqshinn/devices.json
 dest_file: /tmp
 mode: file
 user: ubuntu
