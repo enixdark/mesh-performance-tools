@@ -20,7 +20,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_connect(state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect, time: :os.system_time(:millisecond)}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect, time: System.system_time(:millisecond)}
     end
     :ets.insert(:total, {:erlang.pid_to_list(self())})
     send self(), :connected
@@ -29,7 +29,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_publish(topic, message, state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), message: inspect(message), type: :receive, time: :os.system_time(:millisecond), topic: inspect(topic)}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), message: inspect(message), type: :receive, time: System.system_time(:millisecond), topic: inspect(topic)}
     end
     :ets.insert(:messages, {:erlang.pid_to_list(self())})
     send self(), {:published, self, topic, message}
@@ -38,7 +38,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_subscribe(subscription, state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :subscribe, time: :os.system_time(:millisecond), subscription: inspect(subscription)}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :subscribe, time: System.system_time(:millisecond), subscription: inspect(subscription)}
       Logger.info inspect(subscription)
     end
     send self(), {:subscribed, subscription}
@@ -47,7 +47,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def terminate(var, state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :terminated, time: :os.system_time(:millisecond), reason: inspect(var)}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :terminated, time: System.system_time(:millisecond), reason: inspect(var)}
     end
     :ets.insert(:errors, {:erlang.pid_to_list(self())})
     send self(), :shutdown
@@ -62,7 +62,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   # def terminate(_reason, _state) do
   #   if System.get_env("MESH_DEBUG") do
-  #     Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :terminated, time: :os.system_time(:millisecond), reason: nil}
+  #     Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :terminated, time: System.system_time(:millisecond), reason: nil}
   #   end
   #   :ets.insert(:errors, {:erlang.pid_to_list(self())})
   #   :ok
@@ -76,7 +76,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_disconnect(state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :disconnect, time: :os.system_time(:millisecond)}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :disconnect, time: System.system_time(:millisecond)}
     end
     send state, :disconnected
     {:ok, state}
@@ -84,7 +84,7 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
   
   def on_connect_error(reason, state) do
     if System.get_env("MESH_DEBUG") do
-      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect_error, time: :os.system_time(:millisecond), reason: reason}
+      Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect_error, time: System.system_time(:millisecond), reason: reason}
     end
     send state, :connected_error
     {:ok, state}

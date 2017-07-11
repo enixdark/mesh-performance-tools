@@ -31,14 +31,14 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
                   timeout:  2_000_000] do
         %HTTPotion.AsyncResponse{id: id} ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :subscribe, token: token, time: :os.system_time(:millisecond)}
+            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :subscribe, token: token, time: System.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           async_loop(id, uuid)
           {:noreply, state}
         error ->
           if System.get_env("MESH_DEBUG") do 
-            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :terminated, token: token, reason: error, time: :os.system_time(:millisecond)}
+            Logger.info Poison.encode! %{uuid: uuid, pid: :erlang.pid_to_list(self()), type: :terminated, token: token, reason: error, time: System.system_time(:millisecond)}
           end
           :ets.insert(:total, {"#{:erlang.pid_to_list(self())} uuid"})
           :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", '000'})
@@ -55,12 +55,12 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
     receive do
       {:ibrowse_async_headers, ^id, '200', headers} ->
         if System.get_env("MESH_DEBUG") do 
-          Logger.info inspect(%{uuid: uuid, headers: headers, time: :os.system_time(:millisecond), code: 200, type: :success})
+          Logger.info inspect(%{uuid: uuid, headers: headers, time: System.system_time(:millisecond), code: 200, type: :success})
         end
         async_loop(id, uuid)
       {:ibrowse_async_headers, ^id, status_code, headers} ->
         if System.get_env("MESH_DEBUG") do 
-          Logger.info inspect(%{uuid: uuid, type: :error, time: :os.system_time(:millisecond), code: status_code, headers: headers})
+          Logger.info inspect(%{uuid: uuid, type: :error, time: System.system_time(:millisecond), code: status_code, headers: headers})
         end
         cond do
            Regex.match?(~r/^(4\d+|5\d+)/, status_code |> List.to_string ) -> 
@@ -69,14 +69,14 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         async_loop(id, uuid)
       {:ibrowse_async_response_timeout, ^id} ->
         if System.get_env("MESH_DEBUG") do 
-          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason: :timeout})
+          Logger.info inspect(%{uuid: uuid, time: System.system_time(:millisecond), type: :error, reason: :timeout})
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "403"})
         :timeout
         # async_loop(id)
       {:error, :connection_closed_no_retry} ->
         if System.get_env("MESH_DEBUG") do
-          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :error, reason: :connection_closed})
+          Logger.info inspect(%{uuid: uuid, time: System.system_time(:millisecond), type: :error, reason: :connection_closed})
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "444"})
         :error
@@ -85,14 +85,14 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         if data != [] do
           :ets.insert(:messages, {true})
           if System.get_env("MESH_DEBUG") do
-            Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :receive, message: inspect(data)})
+            Logger.info inspect(%{uuid: uuid, time: System.system_time(:millisecond), type: :receive, message: inspect(data)})
           end
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid"})
         async_loop(id, "#{:erlang.pid_to_list(self())} uuid")
       {:ibrowse_async_response_end, ^id} ->
         if System.get_env("MESH_DEBUG") do
-          Logger.info inspect(%{uuid: uuid, time: :os.system_time(:millisecond), type: :terminated})
+          Logger.info inspect(%{uuid: uuid, time: System.system_time(:millisecond), type: :terminated})
         end
         :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "504"})
     end
