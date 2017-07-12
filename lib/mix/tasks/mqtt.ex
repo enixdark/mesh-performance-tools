@@ -13,5 +13,3 @@ defmodule Mix.Tasks.Mqtt do
   end
 
 end
-
-

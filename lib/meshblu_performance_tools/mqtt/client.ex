@@ -18,8 +18,8 @@ defmodule MeshbluPerformanceTools.MQTT.Client do
   defp handle_subscriber(uri, uuid, token, state) do
     _uri = URI.parse(uri)
     {:ok, pid } = MeshbluPerformanceTools.MQTT.Process.start_link([host: _uri.host, port: _uri.port, username: uuid, password: token])
-    :timer.sleep(100)
-    MeshbluPerformanceTools.MQTT.Process.sub(pid, uuid, 0)
+    :timer.sleep(500)
+    MeshbluPerformanceTools.MQTT.Process.sub(pid, uuid, 1)
     {:ok, state ++ [pid: pid]}
   end
 
