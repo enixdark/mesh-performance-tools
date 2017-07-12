@@ -63,7 +63,6 @@ defmodule MeshbluPerformanceTools.HTTP.Process do
         async_loop(id, "#{:erlang.pid_to_list(self())} uuid")
       {:ibrowse_async_response_end, ^id} ->
         Logger.info inspect(%{uuid: uuid, time: System.system_time(:millisecond), type: :terminated})
-        :ets.insert_new(:errors, {"#{:erlang.pid_to_list(self())} uuid", "504"})
     end
   end
 

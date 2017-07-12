@@ -20,14 +20,12 @@ defmodule MeshbluPerformanceTools.MQTT.Process do
 
   def on_connect(state) do
     Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), type: :connect, time: System.system_time(:millisecond)}
-    :ets.insert(:total, {:erlang.pid_to_list(self())})
     send self(), :connected
     {:ok, state}
   end
 
   def on_publish(topic, message, state) do
     Logger.info Poison.encode! %{host: state[:host], uuid: state[:username], token: state[:password], pid: :erlang.pid_to_list(self()), message: inspect(message), type: :receive, time: System.system_time(:millisecond), topic: inspect(topic)}
-    :ets.insert(:messages, {:erlang.pid_to_list(self())})
     send self(), {:published, self, topic, message}
     {:ok, state}
   end

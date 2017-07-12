@@ -241,7 +241,7 @@ defmodule Mix.Tasks.Base do
       end
 
 
-      defoverridable [loop: 0, parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
+      defoverridable [parse_args: 1, process: 1, process: 4, run: 1, title: 0, process_parse: 2, handle_event: 3]
     end
   end
 
