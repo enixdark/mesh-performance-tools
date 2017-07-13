@@ -11,19 +11,27 @@ services:
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-  logstash:
-    container_name: logstash
-    image: docker.elastic.co/logstash/logstash:5.5.0
+  beat:
+    container_name: beat
+    image: docker.elastic.co/beats/filebeat:5.5.0
     volumes:
-      - ./deployments/docker/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ./deployments/docker/elk/logstash/pipeline:/usr/share/logstash/pipeline
-    ports:
-      - "5000:5000/udp"
-      - "5000:5000/tcp"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      - ./deployments/docker/elk/beats/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./logs:/tmp/
     depends_on:
       - elasticsearch
+  # logstash:
+  #   container_name: logstash
+  #   image: docker.elastic.co/logstash/logstash:5.5.0
+  #   volumes:
+  #     - ./deployments/docker/elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+  #     - ./deployments/docker/elk/logstash/pipeline:/usr/share/logstash/pipeline
+  #   ports:
+  #     - "5000:5000/udp"
+  #     - "5000:5000/tcp"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   depends_on:
+  #     - elasticsearch
 
   kibana:
     container_name: kibana

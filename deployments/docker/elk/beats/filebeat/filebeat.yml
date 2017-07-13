@@ -1,0 +1,24 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /tmp/*.log
+  # paths: ["/tmp/info.log"]
+  # fields:
+  #   type: "info"
+  # paths: ["/tmp/error.log"]
+  # fields:
+  #   type: "error"
+  tail_files: true
+
+output.elasticsearch:
+  hosts: ['elasticsearch:9200']
+  index: "logs-%{+yyyy.MM.dd}"
+  # indices:
+  #   - index: "info-%{+yyyy.MM.dd}"
+  #     when.contains:
+  #       message: "info"
+  #   - index: "error-%{+yyyy.MM.dd}"
+  #     when.contains:
+  #       message: "err"
+  # username: elastic
+  # password: changeme

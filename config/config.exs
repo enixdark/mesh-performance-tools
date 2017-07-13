@@ -27,10 +27,15 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
     # import_config "#{Mix.env}.exs"
+# ================== console ==================
+
 # config :logger, level: :info
 
-# config :logger,
-#   backends: [{LoggerFileBackend, :info}]
+# ================== log file ==================
+config :logger,
+  backends: [{LoggerFileBackend, :info}]
+
+# uncomment if only to use unique log file   
 
 # config :logger, :info,
 #   path: "logs/info.log",
@@ -39,25 +44,30 @@ use Mix.Config
 #   backends: [{LoggerFileBackend, :info},
 #              {LoggerFileBackend, :error}]
 
-# config :logger, :info,
-#   path: "logs/info.log",
-#   level: :info
-
-# config :logger, :error,
-#   path: "logs/error.log",
-#   level: :error
-
-config :logger,
-  backends: [{LoggerLogstashBackend, :info  }]
+# uncomment if want to split between info and error file
 
 config :logger, :info,
-  host: "0.0.0.0",
-  port: 5000,
-  level: :debug,
-  type: "log",
-  metadata: [
-    extra_fields: "meshblu"
-  ]
+  path: "logs/info.log",
+  level: :info
+
+config :logger, :error,
+  path: "logs/error.log",
+  level: :error1
+
+# ================== logstash ==================
+
+# config :logger,
+#   backends: [{LoggerLogstashBackend, :info},
+#                {LoggerFileBackend, :error}]
+
+# config :logger, :info,
+#   host: "0.0.0.0",
+#   port: 5000,
+#   level: :debug,
+#   type: "log",
+#   metadata: [
+#     extra_fields: "meshblu"
+#   ]
 
 config :meshblu_performance_tools, :uri, System.get_env("URI") || "http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:3001" #"http://localhost:3000"
 # config :meshblu_performance_tools, :stream_uri, System.get_env("STREAM_URI") || "http://ads-elb-external-1267527463.ap-southeast-1.elb.amazonaws.com:3001" #"http://localhost:3001"
